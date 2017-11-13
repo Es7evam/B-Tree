@@ -1,6 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "bibliotecas.hpp"
 #define ORDEM 5
 
 typedef struct Arvore{
@@ -15,8 +13,6 @@ typedef struct Registro {
 	char genero[20];
 }Registro;
 
-void checar_vazia();
-void criar_arvore();
 void inserir();
 void busca();
 void split();
