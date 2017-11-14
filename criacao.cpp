@@ -1,5 +1,7 @@
 #include "criacao.hpp"
 
-void criar_arvore(Registro  ){
+void inicializar_BTree(BTree *bt){
+	
+	bt = new Registro ()
 
 }

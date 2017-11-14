@@ -2,4 +2,4 @@
 
 void checar_vazia();
 
-void criar_arvore();
+void criar_BTree();
