@@ -1,10 +1,9 @@
 #include "bibliotecas.hpp"
 #define ORDEM 5
 
-struct Arvore{
-	short raiz;
-	short paginas;
-	FILE *fp;
+struct BTree{
+	int ordem;
+	Registro *raiz;
 };
 
 struct Registro {
