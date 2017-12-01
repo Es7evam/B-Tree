@@ -46,7 +46,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
     Pagina pag_pai;
     int local = 0; /* local onde ser· inserido o elemento promovido */
     int nova = 0; /* nro nova página */
-    int medio = 0; /* posiçao mediana */
+    int medio = (MAXIMO_CHAVES-1)/2; /* posiçao mediana */
     int i = 0;
 
     /* Iniciar as paginas novas
@@ -66,7 +66,6 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
     memset(pag_nova.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));    
     
     //minimo de elementos
-    medio = (MAXIMO_CHAVES-1)/2;
 
     /* Insere os elementos da pagina a sofrer 'splitting' na pagina
      * nova e remove os mesmos da pagina original. */
@@ -130,7 +129,7 @@ int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem) {
     int i;
     /* Primeiramente, procurar por um lugar vazio no vetor. */
     for(i=0; i < pag->num_chaves && !finalizado; i++ ) {
-    	if(id[i] - elem.id > 0){ 
+    	if(pag->id[i] - elem.id > 0){ 
         //if(strcmp(pag->entradas[i].CEP, elem.CEP) > 0)  {
             posicao_ideal = i;
             finalizado = 1;
