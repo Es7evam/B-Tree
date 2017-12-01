@@ -19,7 +19,7 @@ typedef struct tRegistro {
     int id;
     string titulo;
     string genero;
-    unsigned int byte_offset;
+    unsigned int byte_offset; // tamanho
 } tRegistro;
 
 typedef struct Pagina { 
@@ -59,3 +59,5 @@ int arvore_inserir(Arvore *arv, tRegistro elem); //ok caso split MAXIMO
 int arvore_busca(Arvore *arv, int idBusca); //ok
 
 void arvore_iniciar(Arvore *arv); //ok
+
+void arvore_imprimir(Arvore *arv);

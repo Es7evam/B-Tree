@@ -270,3 +270,20 @@ void arvore_iniciar(Arvore *arv) { //ok
 
     pagina_escrever(arv, &pag, -1);
 }
+
+void arvore_imprimir(Arvore *arv){
+    Pagina pag;
+    int i, j;
+
+    printf("Raiz: %d\n", arv->raiz);
+    printf("Imprimindo %d paginas\n", arv->paginas);
+    for(i = 0; i < arv->paginas; i++) {
+        printf("Imprimindo pagina %d\n", i);
+        pagina_ler(arv, &pag, i);
+        for(j = 0; j < pag->num_chaves; j++) {
+            printf("ponteiro[%d]: = %d\nelemento[%d] = %s\n", j, pag->ponteiros[j], j, pag->entradas[j]->CEP);
+        }
+        printf("ponteiro[%d]: = %d\n", j, pag->ponteiros[j]);
+        printf("--------------------\n");
+    }
+}

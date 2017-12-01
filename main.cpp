@@ -8,12 +8,6 @@ int main(void) {
     tRegistro temp;
     Arvore arvore;
 
-#ifdef DEBUG
-    Pagina pag;
-    int j;
-    int i;
-#endif
-
     arvore_iniciar(&arvore);
     
     arvore.fp = fopen("indices.dat", "rb+");
@@ -44,17 +38,7 @@ int main(void) {
     }
 
 #ifdef DEBUG
-    printf("Raiz: %d\n", arvore.raiz);
-    printf("Imprimindo %d paginas\n", arvore.paginas);
-    for(i = 0; i < arvore.paginas; i++) {
-        printf("Imprimindo p·gina %d\n", i);
-        pagina_ler(&arvore, &pag, i);
-        for(j = 0; j < pag.num_chaves; j++) {
-            printf("ponteiro[%d]: = %d\nelemento[%d] = %s\n", j, pag.ponteiros[j], j, pag.entradas[j].CEP);
-        }
-        printf("ponteiro[%d]: = %d\n", j, pag.ponteiros[j]);
-        printf("--------------------\n");
-    }
+    arvore_imprimir(&arvore);
 #endif
 
     consultas = fopen("consultas.txt", "r");
