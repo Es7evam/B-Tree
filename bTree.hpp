@@ -39,7 +39,7 @@ typedef struct Arvore {
     FILE *fp;
 } Arvore;
 
-#define TAMANHO_PAGINA sizeof(Arvore) //1024
+#define TAMANHO_PAGINA sizeof(Pagina) //1024
 
 #ifdef MEMORIA
 /* Buffer de memÛria */
