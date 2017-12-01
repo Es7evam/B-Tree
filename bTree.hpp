@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <cstring>
+#include <string>
+#include <cstdio>
+using namespace std;
+
 #define MAXIMO_CHAVES 4 /* Ordem 5 */
 
 /* Pequena macro para eliminar quebra de linha de WindowsÆ */
-#define LIMPAR_QUEBRA(x) if(x[strlen(x)-2] == 0x0D) x[strlen(x)-2] = '\0'
-/* Macro para preencher com -1 um vetor. Usado para "anular" ponteiros
- * das p·ginas */
-#define NULLIFICAR(x) memset(x, -1, (MAXIMO_CHAVES+1)*sizeof(short))
+#define LIMPAR_QUEBRA(x) if(x[strlen(x)-2] == 0x0D) x[strlen(x)-2] = '\0' //se EndOfLine (ajeitar)
 
 /* ****************** DECLARA«ES DE TIPOS ****************** */
 
@@ -21,10 +23,11 @@ typedef struct tRegistro {
 } tRegistro;
 
 typedef struct Pagina { 
+    unsigned short num_chaves;
+    
     int id[MAXIMO_CHAVES];
     int byte_offset[MAXIMO_CHAVES]; //byte offset do id correspondente
     
-    unsigned short num_chaves;
     int ponteiros[MAXIMO_CHAVES+1]; //RRN da pagina apontada
 } Pagina;
 
@@ -43,10 +46,16 @@ typedef struct Arvore {
 char buffer[2000000] = {};
 #endif
 
-int pagina_ler(Arvore *arv, Pagina *pag, int pagina);
+int pagina_escrever(Arvore *arv, Pagina *pag, int pagina);
 
-int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem);
+int pagina_ler(Arvore *arv, Pagina *pag, int pagina); //ok
 
-void arvore_iniciar(Arvore *arv);
+int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai);
 
-int pagina_escrever(Arvore *avr, Pagina *pag, int pagina);
+int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem); // ok
+
+int arvore_inserir(Arvore *arv, tRegistro elem); //ok caso split MAXIMO
+
+int arvore_busca(Arvore *arv, int idBusca); //ok
+
+void arvore_iniciar(Arvore *arv); //ok

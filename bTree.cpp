@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "bTree.h"
+#include "bTree.hpp"
 
 int pagina_escrever(Arvore *arv, Pagina *pag, int pagina) {
 #ifdef MEMORIA
@@ -57,16 +57,16 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
     else {
         pag_pai.num_chaves = 0;
         memset(pag_pai.entradas, 0, MAXIMO_CHAVES*sizeof(tRegistro));
-        NULLIFICAR(pag_pai.ponteiros);
+    	memset(pag_pai.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));
     }
 
     /* Cria a nova p·gina */
     pag_nova.num_chaves = 0;
     memset(pag_nova.entradas, 0, MAXIMO_CHAVES*sizeof(tRegistro));
-    NULLIFICAR(pag_nova.ponteiros);
-
-    /* MÈdio È: elementos + mÈdio + elementos: sÛ que o elemento
-     * m·ximo È m·ximo - 1, pois È baseado no zero. */
+    memset(pag_nova.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));
+    
+    
+    //minimo de elementos
     medio = (MAXIMO_CHAVES-1)/2;
 
     /* Insere os elementos da p·gina a sofrer 'splitting' na p·gina
@@ -121,16 +121,15 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
 }
 
 int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem) {
-    int i = 0;
-    int j = 0;
     int finalizado = 0;
     int posicao_ideal = -1;
 
     pag->num_chaves++;
 
     /* Primeiramente, procurar por um lugar vazio no vetor. */
-    for(i = 0; i < pag->num_chaves && !finalizado; i++ ) {
-        if(strcmp(pag->entradas[i].CEP, elem.CEP) > 0)  {
+    for(int i = 0; i < pag->num_chaves && !finalizado; i++ ) {
+    	if(id[i] - elem.id > 0){ 
+        //if(strcmp(pag->entradas[i].CEP, elem.CEP) > 0)  {
             posicao_ideal = i;
             finalizado = 1;
         }
@@ -141,17 +140,18 @@ int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem) {
         posicao_ideal = pag->num_chaves-1;
     }
 
-    j = posicao_ideal;
+    i = posicao_ideal;
 
     /* Procura um espaÁo vazio. */
-    while(strlen(pag->entradas[j].CEP) != 0) j++;
+    while(strlen(pag->id[i]) != 0) 
+    	i++;
 
-    while(posicao_ideal != j) {
-        pag->ponteiros[j+1] = pag->ponteiros[j]; /* move o ponteiro adiantado */
-        pag->ponteiros[j] = -1;
+    while(posicao_ideal != i) {
+        pag->ponteiros[i+1] = pag->ponteiros[i]; /* move o ponteiro adiantado */
+        pag->ponteiros[i] = -1;
 
-        pag->entradas[j] = pag->entradas[j-1];
-        j--;
+        pag->entradas[i] = pag->entradas[i-1];
+        i--;
     }
 
     /* Move os ponteiros e finalmente aloca o elemento em sua posiÁo. */
@@ -163,7 +163,6 @@ int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem) {
 }
 
 int arvore_inserir(Arvore *arv, tRegistro elem) {
-    int i;
     int pagina_pai = -1;
     int pagina_atual;
     int fim_pagina = 0;
@@ -173,16 +172,18 @@ int arvore_inserir(Arvore *arv, tRegistro elem) {
     pagina_atual = arv->raiz;
 
     if(pagina_atual == arv->raiz && pag.num_chaves == MAXIMO_CHAVES) {
+    	//fazendo split da raiz se necessario
         pagina_atual = pagina_split(arv, &pag, pagina_atual, -1);
         pagina_ler(arv, &pag, arv->raiz);
         pagina_pai = -1;
     }
 
-    while(1) {
-        for(i = 0; i <= pag.num_chaves && !fim_pagina; i++) {
+    while(true) {
+        for(int i = 0; i <= pag.num_chaves && !fim_pagina; i++) {
             /* Checa-se se È o ?ltimo ponteiro da p·gina ou se È um local adequado
              * a se buscar um ponteiro por p·gina */
-            if(i == pag.num_chaves || strcmp(pag.entradas[i].CEP, elem.CEP) > 0) {
+            //if(i == pag.num_chaves || strcmp(pag.entradas[i].CEP, elem.CEP) > 0) {
+        	if(i == pag.num_chaves || pag.id[i] - elem.id > 0){
                 if(pag.ponteiros[i] != -1) {
                     pagina_pai = pagina_atual;
                     pagina_atual = pag.ponteiros[i];
@@ -211,10 +212,9 @@ int arvore_inserir(Arvore *arv, tRegistro elem) {
     return 0;
 }
 
-long arvore_busca(Arvore *arv, const char *CEP) {
+int arvore_busca(Arvore *arv, int idBusca) { //ok
     Pagina pag;
     int i = 0;
-    int comparacao = 0;
     int finalizado_arvore = 0;
     int finalizado_pagina = 0;
 
@@ -222,17 +222,16 @@ long arvore_busca(Arvore *arv, const char *CEP) {
     while(!finalizado_arvore) {
         /* Itera entre os ponteiros da ·rvore. */
         for(i = 0; i < pag.num_chaves && !finalizado_pagina; i++) {
-            comparacao = strcmp(pag.entradas[i].CEP, CEP);
-            /* Se o CEP a ser buscado È menor que o elemento atual, 'entra
-             * no ponteiro'. */
-            if(comparacao > 0) {
+        	//se o buscado é menor que o atual entra
+            if(pag.id[i] - idBusca > 0) {
                 if(pag.ponteiros[i] >= 0) {
                     pagina_ler(arv, &pag, pag.ponteiros[i]);
                     finalizado_pagina = 1;
-                } else return -1; /* Se no existe ponteiro, acabou a busca. */
+                } else 
+                	return -1; /* Se no existe ponteiro, acabou a busca. */
             } else {
-                if(comparacao == 0) {
-                    return (long)pag.entradas[i].byte_offset;
+                if(pag.id[i] == idBusca) {
+                    return pag.byte_offset[i];
                 }
             }
         }
@@ -248,21 +247,23 @@ long arvore_busca(Arvore *arv, const char *CEP) {
             if(pag.ponteiros[i] >= 0) {
                 finalizado_pagina = 0;
                 pagina_ler(arv, &pag, pag.ponteiros[i]);
-            } else finalizado_arvore = 1; /* Se no encontramos nada... */
+            } else 
+            	finalizado_arvore = 1; /* Se no encontramos nada... */
         }
     }
     return -1;
 }
 
-void arvore_iniciar(Arvore *arv) {
+void arvore_iniciar(Arvore *arv) { //ok
     Pagina pag;
 
     arv->paginas = 1;
     arv->raiz = 0;
-    arv->ponteiro = -TAMANHO_PAGINA; /* ComeÁa com -tamanho_pagina para facilitar a funÁo de escrita. */
+    arv->ponteiro = -TAMANHO_PAGINA; /* Começa com -tampag para facilitar */
+    arv->fp = NULL;
     
     pag.num_chaves = 0;
-    NULLIFICAR(pag.ponteiros);
+    memset(pag.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));
     memset(pag.entradas, 0, MAXIMO_CHAVES*sizeof(tRegistro));
 
     pagina_escrever(arv, &pag, -1);

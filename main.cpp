@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "bTree.h"
+#include "bTree.hpp"
 
 int main(void) { 
     long offset = 0;
@@ -17,25 +14,31 @@ int main(void) {
     int i;
 #endif
 
-    arvore.fp = fopen("indices.dat", "wb+"); //ajeitar
     arvore_iniciar(&arvore);
+    
+    arvore.fp = fopen("indices.dat", "rb+");
+    if(arvore.fp == NULL)
+        arvore.fp = fopen("indices.dat", "wb+"); //ajeitar nome arquivo (talvez rb+)
 
-    ceps = fopen("cep.txt", "rb"); //ajeitar
+    ceps = fopen("dados.dat", "rb"); //ajeitar nome arquivo
 
     //MONTANDO ARVORE
     while(!feof(ceps)) { // 0 se final do arquivo
         offset = ftell(ceps);
+        int ids;
+        string title;
+        string gen;
 
         fgets(buff, 1000, ceps);
         
         memcpy(temp.CEP, buff, 8);
         
         //temp.CEP[8] = '\0';
+        //AJEITAR
 
-        int id;
-        string titulo;
-        string genero;
-
+        temp.id = ids;
+        temp.titulo = title;
+        temp.genero = gen;
         temp.byte_offset = offset; /* Pega o byte offset, adquirido anteriormente. */
         arvore_inserir(&arvore, temp);
     }
@@ -56,9 +59,14 @@ int main(void) {
 
     consultas = fopen("consultas.txt", "r");
     while(!feof(consultas)) {
-        fgets(buff, 1000, consultas);
+    	fgets(buff, 1000, consultas);
         LIMPAR_QUEBRA(buff);
+ 
+		/*
         offset = arvore_busca(&arvore, buff);
+        */ 
+        // AJEITAR AQUI
+        
         if(offset < 0) {
             printf("%s NAO ENCONTRADO\n", buff);
         }
