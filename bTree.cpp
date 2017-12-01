@@ -45,34 +45,34 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
     Pagina pag_nova;
     Pagina pag_pai;
     int local = 0; /* local onde ser· inserido o elemento promovido */
-    int nova = 0; /* n?mero da nova p·gina */
+    int nova = 0; /* nro nova página */
     int medio = 0; /* posiçao mediana */
     int i = 0;
 
-    /* Iniciar as p·ginas novas
-     * Se o pai j· existir, lÍ-lo, caso contr·rio, cria-se um novo nÛ */
+    /* Iniciar as paginas novas
+     * Se o pai ja existir, lê, caso contrário cria*/
     if(pai >= 0) {
         pagina_ler(arv, &pag_pai, pai);
     }
     else {
         pag_pai.num_chaves = 0;
-        memset(pag_pai.entradas, 0, MAXIMO_CHAVES*sizeof(tRegistro));
+        memset(pag_pai.id, 0, MAXIMO_CHAVES*sizeof(int));
     	memset(pag_pai.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));
     }
 
-    /* Cria a nova p·gina */
+    /* Cria a nova pagina */
     pag_nova.num_chaves = 0;
-    memset(pag_nova.entradas, 0, MAXIMO_CHAVES*sizeof(tRegistro));
+    memset(pag_nova.id, 0, MAXIMO_CHAVES*sizeof(int));
     memset(pag_nova.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));    
     
     //minimo de elementos
     medio = (MAXIMO_CHAVES-1)/2;
 
-    /* Insere os elementos da p·gina a sofrer 'splitting' na p·gina
-     * nova e remove os mesmos da p·gina original. */
+    /* Insere os elementos da pagina a sofrer 'splitting' na pagina
+     * nova e remove os mesmos da pagina original. */
     for(i = medio+1; i < MAXIMO_CHAVES; i++) {
         /* i-(medio+1) faz com que o laÁo comece em 0 para
-         * a p·gina nova, que vai receber os novos elementos. */
+         * a pagina nova, que vai receber os novos elementos. */
         pag_nova.entradas[i-(medio+1)] = pag->entradas[i];
         pag->entradas[i].CEP[0] = '\0'; /* Apaga o elemento, 
                                            anulando a string. */
@@ -91,7 +91,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
     nova = pagina_escrever(arv, &pag_nova, -1);
 
     /* InÌcio do "promoting". */
-    /* Agora insere o elemento mediano na p·gina pai. */
+    /* Agora insere o elemento mediano na pagina pai. */
     local = pagina_inserir(arv, &pag_pai, pag->entradas[medio]);
     pag->entradas[medio].CEP[0] = '\0';
 
@@ -127,9 +127,9 @@ int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem) {
     int posicao_ideal = -1;
 
     pag->num_chaves++;
-
+    int i;
     /* Primeiramente, procurar por um lugar vazio no vetor. */
-    for(int i = 0; i < pag->num_chaves && !finalizado; i++ ) {
+    for(i=0; i < pag->num_chaves && !finalizado; i++ ) {
     	if(id[i] - elem.id > 0){ 
         //if(strcmp(pag->entradas[i].CEP, elem.CEP) > 0)  {
             posicao_ideal = i;
@@ -145,7 +145,7 @@ int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem) {
     i = posicao_ideal;
 
     /* Procura um espaÁo vazio. */
-    while(strlen(pag->id[i]) != 0) 
+    while(pag->id[i] != 0) 
     	i++;
 
     while(posicao_ideal != i) {
@@ -182,8 +182,8 @@ int arvore_inserir(Arvore *arv, tRegistro elem) {
 
     while(true) {
         for(int i = 0; i <= pag.num_chaves && !fim_pagina; i++) {
-            /* Checa-se se È o ?ltimo ponteiro da p·gina ou se È um local adequado
-             * a se buscar um ponteiro por p·gina */
+            /* Checa-se se È o ?ltimo ponteiro da pagina ou se È um local adequado
+             * a se buscar um ponteiro por pagina */
             //if(i == pag.num_chaves || strcmp(pag.entradas[i].CEP, elem.CEP) > 0) {
         	if(i == pag.num_chaves || pag.id[i] - elem.id > 0){
                 if(pag.ponteiros[i] != -1) {
@@ -199,9 +199,9 @@ int arvore_inserir(Arvore *arv, tRegistro elem) {
                     fim_pagina = 1;
                 }
                 else {
-                    /* Inserir na p·gina, caso a mesma no esteja vazia. */
+                    /* Inserir na pagina, caso a mesma no esteja vazia. */
 #ifdef DEBUG
-                    printf("Inserindo %s na p·gina %d\n", elem.CEP, pagina_atual);
+                    printf("Inserindo %s na pagina %d\n", elem.CEP, pagina_atual);
 #endif
                     pagina_inserir(arv, &pag, elem);
                     pagina_escrever(arv, &pag, pagina_atual);
@@ -237,7 +237,7 @@ int arvore_busca(Arvore *arv, int idBusca) { //ok
                 }
             }
         }
-        /* Se saiu do laÁo, ou È porque achamos uma p·gina e vamos
+        /* Se saiu do laÁo, ou È porque achamos uma pagina e vamos
          * comeÁar a leitura nela (finalizado_pagina = 1) ou
          * È porque no encontramos candidatos para tal. Fazer uma
          * ?ltima tentativa no ponteiro p+1. Se ele no existir,
@@ -280,10 +280,10 @@ void arvore_imprimir(Arvore *arv){
     for(i = 0; i < arv->paginas; i++) {
         printf("Imprimindo pagina %d\n", i);
         pagina_ler(arv, &pag, i);
-        for(j = 0; j < pag->num_chaves; j++) {
-            printf("ponteiro[%d]: = %d\nelemento[%d] = %s\n", j, pag->ponteiros[j], j, pag->entradas[j]->CEP);
+        for(j = 0; j < pag.num_chaves; j++) {
+            printf("ponteiro[%d]: = %d\nelemento[%d] = %s\n", j, pag.ponteiros[j], j, pag.entradas[j]->CEP);
         }
-        printf("ponteiro[%d]: = %d\n", j, pag->ponteiros[j]);
+        printf("ponteiro[%d]: = %d\n", j, pag.ponteiros[j]);
         printf("--------------------\n");
     }
 }
