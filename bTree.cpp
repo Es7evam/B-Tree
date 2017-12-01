@@ -63,8 +63,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
     /* Cria a nova p·gina */
     pag_nova.num_chaves = 0;
     memset(pag_nova.entradas, 0, MAXIMO_CHAVES*sizeof(tRegistro));
-    memset(pag_nova.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));
-    
+    memset(pag_nova.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));    
     
     //minimo de elementos
     medio = (MAXIMO_CHAVES-1)/2;
@@ -101,9 +100,12 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
     pag_pai.ponteiros[local+1] = nova;
     
     /* Atualiza a ·rvore */
-    if(pai == -1) arv->paginas += 2; else arv->paginas++;
-    pai = pagina_escrever(arv, &pag_pai, pai);
+    if(pai == -1) 
+    	arv->paginas += 2; 
+    else 
+    	arv->paginas++;
 
+    pai = pagina_escrever(arv, &pag_pai, pai);
     pagina_escrever(arv, pag, pagina);
 
 #ifdef DEBUG

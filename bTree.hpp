@@ -46,11 +46,11 @@ typedef struct Arvore {
 char buffer[2000000] = {};
 #endif
 
-int pagina_escrever(Arvore *arv, Pagina *pag, int pagina);
+int pagina_escrever(Arvore *arv, Pagina *pag, int pagina); //ok
 
 int pagina_ler(Arvore *arv, Pagina *pag, int pagina); //ok
 
-int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai);
+int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai); 
 
 int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem); // ok
 
