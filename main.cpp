@@ -23,7 +23,7 @@ int main(void) {
 
 
     int  idTmp;
-    string tituloTmp;, generoTmp;
+    string tituloTmp, generoTmp;
     cout << "Menu\n";
     cout << "1) Criar Índice\n";
     cout << "2) Inserir Música\n";
@@ -47,12 +47,16 @@ int main(void) {
                 getline(cin, tituloTmp);
                 cout << "Digite o genero da musica" << endl;
                 getline(cin, generoTmp);
-                insercao(&arvore, id, string tituloTmp, string generoTmp, offset);
+#ifdef DEBUG
+                cout << "Debug case 2:" << idTmp << " " << tituloTmp << " " << generoTmp;
+#endif
+                insercao(&arvore, idTmp, tituloTmp, generoTmp);
                 break;
             
             case 3:
+                cout << "Digite o id da musica que quer buscar: ";
                 cin >> idTmp;
-                busca(&arvore, int idTmp);
+                busca(&arvore, idTmp);
                 break;
             
             case 4:
@@ -69,7 +73,7 @@ int main(void) {
         }
     }
 
-
+/*
     //MONTANDO ARVORE
     while(!feof(DATA_FILE)) { // 0 se final do arquivo
         offset = ftell(DATA_FILE);
@@ -87,22 +91,22 @@ int main(void) {
         temp.id = ids;
         temp.titulo = title;
         temp.genero = gen;
-        temp.byte_offset = offset; /* Pega o byte offset, adquirido anteriormente. */
+        temp.byte_offset = offset; // Pega o byte offset, adquirido anteriormente.
         arvore_inserir(&arvore, temp);
     }
-
+*/
 #ifdef DEBUG
     arvore_imprimir(&arvore);
 #endif
-
+/*
     consultas = fopen("consultas.txt", "r");
     while(!feof(consultas)) {
     	fgets(buff, 1000, consultas);
         LIMPAR_QUEBRA(buff);
  
-		/*
-        offset = arvore_busca(&arvore, buff);
-        */ 
+		
+        //offset = arvore_busca(&arvore, buff);
+         
         // AJEITAR AQUI
         
         if(offset < 0) {
@@ -115,6 +119,7 @@ int main(void) {
             printf("%s\n", buff);
         }
     }
+*/
     fclose(arvore.fp);
     fclose(consultas);
     fclose(DATA_FILE);

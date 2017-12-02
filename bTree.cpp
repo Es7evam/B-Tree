@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "bTree.hpp"
 
 int pagina_escrever(Arvore *arv, Pagina *pag, int pagina) {
@@ -39,13 +36,13 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
     }
     else {
         pag_pai.num_chaves = 0;
-        memset(pag_pai.id, 0, MAXIMO_CHAVES*sizeof(int));
+        memset(pag_pai.entradas, 0, MAXIMO_CHAVES*sizeof(entrada));
     	memset(pag_pai.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));
     }
 
     /* Cria a nova pagina */
     pag_nova.num_chaves = 0;
-    memset(pag_nova.id, 0, MAXIMO_CHAVES*sizeof(int));
+    memset(pag_nova.entradas, 0, MAXIMO_CHAVES*sizeof(entrada));
     memset(pag_nova.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));    
     
     //minimo de elementos
@@ -183,7 +180,7 @@ int arvore_inserir(Arvore *arv, entrada elem) {
                 else {
                     /* Inserir na pagina, caso a mesma no esteja vazia. */
 #ifdef DEBUG
-                    printf("Inserindo %s na pagina %d\n", elem.id, pagina_atual);
+                    printf("Inserindo %d na pagina %d\n", elem.id, pagina_atual);
 #endif
                     pagina_inserir(arv, &pag, elem);
                     pagina_escrever(arv, &pag, pagina_atual);
@@ -262,8 +259,10 @@ void arvore_build(Arvore *arv){ //ajeitar tudo
     int offset;
     //lembrar flag aqui ajeitar
     tRegistro tmp;
-    entrada temp;
-
+    entrada temp; //AJEITAR TUDO
+    rewind(arv->fp);
+    
+    /*
     while(!feof(DATA_FILE)) { // 0 se final do arquivo
         offset = ftell(DATA_FILE);
         tmp = arquivo_ler(arv, DATA_FILE);
@@ -277,9 +276,10 @@ void arvore_build(Arvore *arv){ //ajeitar tudo
         //AJEITAR
 
         temp.id = ids;
-        temp.byte_offset = offset; /* Pega o byte offset, adquirido anteriormente. */
+        temp.byte_offset = offset; // Pega o byte offset, adquirido anteriormente.
         arvore_inserir(&arvore, temp);
     }
+    */
 }
 
 void arvore_imprimir(Arvore *arv){
@@ -292,7 +292,7 @@ void arvore_imprimir(Arvore *arv){
         printf("Imprimindo pagina %d\n", i);
         pagina_ler(arv, &pag, i);
         for(j = 0; j < pag.num_chaves; j++) {
-            printf("ponteiro[%d]: = %d\nelemento[%d] = %s\n", j, pag.ponteiros[j], j, pag.entradas[j]->CEP);
+            printf("ponteiro[%d]: = %d\nelemento[%d] = %d\n", j, pag.ponteiros[j], j, pag.entradas[j].id); //ajeitar(?)
         }
         printf("ponteiro[%d]: = %d\n", j, pag.ponteiros[j]);
         printf("--------------------\n");
@@ -305,8 +305,16 @@ int rrnToOffset(int rrn){
 
 //ESCREVER NO ARQUIVO DE DADOS
 int getStrSize(tRegistro *reg, char *buffer){
-    sprintf(buffer, "%d|%s|%s|", reg->id, reg->titulo, reg->genero);
-    return buffer.size();
+    stringstream tmpBuffer;
+    tmpBuffer << reg->id << "|" << reg->titulo << "|" << reg->genero << "|";
+    string tmpString = tmpBuffer.str();
+
+    strcpy(buffer, tmpString.c_str());
+#ifdef DEBUG
+    cout << buffer << ": " << strlen(buffer) << endl; 
+#endif
+    //sprintf(buffer, "%d|%s|%s|", reg->id, reg->titulo, reg->genero);
+    return strlen(buffer);
 }
 
 int arquivo_escrever(tRegistro *reg){
@@ -342,15 +350,18 @@ tRegistro arquivo_ler(Arvore *arv, FILE *fp, int *offset){
     tRegistro reg;
 
     (*offset) = ftell(fp);
-    fread(&tamanho, sizeof(tamanho), 1, fp)
+    fread(&tamanho, sizeof(tamanho), 1, fp);
     fread(buffer, tamanho, 1, fp);
     pos = 0;
     sscanf(parser(buffer, &pos), "%d", &reg.id);
-    strcpy(reg.titulo, parser(buffer, &pos));
-    strcpy(reg.genero, parser(buffer, &pos));
+    string tituloTmp(parser(buffer, &pos));
+    string generoTmp(parser(buffer, &pos));
+
+    //strcpy(reg.titulo, parser(buffer, &pos)); ajeitar (remover, ou não)
+    //strcpy(reg.genero, parser(buffer, &pos));
 
 #ifdef DEBUG
-    printf("Leu id:%d, titulo:%s, genero:%s\n", reg.id, reg.titulo, reg.genero);
+    cout << "Leu id: " << reg.id << ", titulo: " << reg.titulo << ", genero: " << reg.genero << endl;
 #endif
 
     return reg;
@@ -365,7 +376,7 @@ void insercao(Arvore *arv, int tmpId, string title, string gender){
     tmpReg.titulo = title;
     tmpReg.genero = gender;
 
-    int offset = arquivo_escrever(&reg);
+    int offset = arquivo_escrever(&tmpReg);
 
     elemEntrada.id = tmpId;
     elemEntrada.byte_offset = offset; // ajeitar
@@ -374,5 +385,18 @@ void insercao(Arvore *arv, int tmpId, string title, string gender){
 
 void busca(Arvore *arv, int idBusca){
     int offset = arvore_busca(arv, idBusca);
-    fseek(arv->fp, offset, SEEK_SET);
+    if(offset == -1){
+        cout << "Musica com o id " << idBusca << " nao encontrada!" << endl;
+        return;
+    }else{
+        fseek(arv->fp, offset, SEEK_SET);
+
+        tRegistro tmpReg;
+        tmpReg = arquivo_ler(arv, arv->fp, &offset);
+
+        cout << "Musica encontrada" << endl;
+        cout << "Id: " << tmpReg.id << endl;
+        cout << "Titulo: " << tmpReg.titulo << endl;
+        cout << "Genero: " << tmpReg.genero << endl;
+    }
 }

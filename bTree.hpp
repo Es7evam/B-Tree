@@ -2,14 +2,17 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <cstring>
 #include <string>
-#include <cstdio>
+#include <cstdio> //file functions
+#include <iostream> //cin, cout, cerr, clog
+#include <sstream> //stringstream
 using namespace std;
 
-#define DATA_FILE ceps
+//#define DATA_FILE ceps
 
 #define MAXIMO_CHAVES 4 /* Ordem 5 */
+#define TAMANHO_PAGINA (4*(3*(MAXIMO_CHAVES+1) - 1)) //56 pra ordem 5, 4 é sizeof(int)
+
 /* Pequena macro para eliminar quebra de linha de WindowsÆ */
 #define LIMPAR_QUEBRA(x) if(x[strlen(x)-2] == 0x0D) x[strlen(x)-2] = '\0' //se EndOfLine (ajeitar)
 
@@ -28,7 +31,7 @@ typedef struct tRegistro {
 } tRegistro;
 
 typedef struct Pagina { 
-    unsigned short num_chaves;
+    int num_chaves;
     
     entrada entradas[MAXIMO_CHAVES];
 
@@ -45,8 +48,6 @@ typedef struct Arvore {
     int ponteiro;
     FILE *fp;
 } Arvore;
-
-#define TAMANHO_PAGINA sizeof(Pagina) //1024
 
 #ifdef MEMORIA
 /* Buffer de memória */
@@ -92,12 +93,14 @@ int pagina_inserir(Arvore *arv, Pagina *pag, entrada elem); // ok
     */
 int arvore_inserir(Arvore *arv, entrada elem); //ok
 
+
     /*
     Busca o idBusca dentro da árvore.
     Usa chamadas das funções de páginas para isso, de modo iterativo 
     Retorna o offset do id respectivo, caso não encontre retorna -1.
     */
 int arvore_busca(Arvore *arv, int idBusca); //ok
+
 
     /*
     Inicializa a árvore.
@@ -106,10 +109,12 @@ int arvore_busca(Arvore *arv, int idBusca); //ok
     */
 void arvore_iniciar(Arvore *arv, bool build); //ok
 
+
     /*
     Constrói a árvore à partir do arquivo de dados
     */
 void arvore_build(Arvore *arv);
+
 
     /*
     Imprime a árvore de modo iterativo
@@ -120,15 +125,14 @@ void arvore_imprimir(Arvore *arv);
 // Função para o cálculo do Byte_Offset à partir do rrn dado.
 int rrnToOffset(int rrn);
 
+//escrita no arquivo de dados
+int getStrSize(tRegistro *reg, char *buffer);
+int arquivo_escrever(tRegistro *reg);
+
 /* Funções de manipulação do arquivo de dados */
 //leitura do arquivo de dados
 char *parser(char *buffer, int *pos);
-void arquivo_ler(Arvore *arv, FILE*fp, int *offset);
-
-//escrita no arquivo de dados
-int getStrSize(tRegistro *reg, char *buffer);
-void arquivo_escrever(tRegistro *reg);
-
+tRegistro arquivo_ler(Arvore *arv, FILE*fp, int *offset);
 
 /* Funções chamadas pelo menu*/
 void insercao(Arvore *arv, int tmpId, string title, string gender);
