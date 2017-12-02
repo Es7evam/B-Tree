@@ -14,9 +14,7 @@ using namespace std;
 
 #define MAXIMO_CHAVES 4 /* Ordem 5 */
 #define TAMANHO_PAGINA (4*(3*(MAXIMO_CHAVES+1) - 1)) //56 pra ordem 5, 4 é sizeof(int)
-
-/* Pequena macro para eliminar quebra de linha de WindowsÆ */
-#define LIMPAR_QUEBRA(x) if(x[strlen(x)-2] == 0x0D) x[strlen(x)-2] = '\0' //se EndOfLine (ajeitar)
+#define clear() printf("\033[H\033[J")
 
 /* ****************** DECLARA«ES DE TIPOS ****************** */
 
@@ -108,13 +106,13 @@ int arvore_busca(Arvore *arv, int idBusca); //ok
     Se build for true, ela construirá a árvore à partir do arquivo de dados
     Se build for false, apenas inicializa a árvore vazia.
     */
-void arvore_iniciar(Arvore *arv, bool build); //ok
+void arvore_iniciar(Arvore *arv, bool build, FILE *fp); //ok
 
 
     /*
     Constrói a árvore à partir do arquivo de dados
     */
-void arvore_build(Arvore *arv);
+void arvore_build(Arvore *arv, FILE *fp);
 
 
     /*

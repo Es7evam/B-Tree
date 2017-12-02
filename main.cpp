@@ -1,7 +1,7 @@
 #include "bTree.hpp"
 
 int main(void) {
-    freopen (LOG_FILE,"w",stderr);
+    freopen (LOG_FILE,"a",stderr);
 
     int offset = 0;
     char buff[1000] = {};
@@ -19,7 +19,7 @@ int main(void) {
     }
 
     
-    arvore_iniciar(&arvore, false); //não constrói, só inicia
+    arvore_iniciar(&arvore, false, dataFile); //não constrói, só inicia
 
     int  idTmp;
     string tituloTmp, generoTmp;
@@ -37,8 +37,8 @@ int main(void) {
                     break;
                 }
                 clog << "Execucao da criacao do arquivo de indice " << INDEX_FILE;
-                clog << " com base no arquivo de nome " << DATA_FILE << ".\n";
-                arvore_iniciar(&arvore, true);
+                clog << " com base no arquivo de dados " << DATA_FILE << ".\n";
+                arvore_iniciar(&arvore, true, dataFile);
                 break;
     
            case 2:
@@ -49,12 +49,9 @@ int main(void) {
                 getline(cin, tituloTmp);
                 cout << "Digite o genero da musica" << endl;
                 getline(cin, generoTmp);
-                clog << "Execucao de operacao de INSERCAO de" << idTmp << ", " << tituloTmp;
-                clog << ", " << generoTmp << "." << endl;
+                clog << "Execucao de operacao de INSERCAO de " << idTmp << ", " << tituloTmp;
+                clog << ", " << generoTmp << "." << endl; //leitura ok
 
-#ifdef DEBUG
-                cout << "Debug case 2:" << idTmp << " " << tituloTmp << " " << generoTmp;
-#endif
                 insercao(&arvore, idTmp, tituloTmp, generoTmp);
                 break;
             
@@ -77,6 +74,9 @@ int main(void) {
                 break;
         }
     }
+#ifdef DEBUG
+    //arvore_imprimir(&arvore);
+#endif
 
 /*
     //MONTANDO ARVORE
@@ -100,9 +100,6 @@ int main(void) {
         arvore_inserir(&arvore, temp);
     }
 */
-#ifdef DEBUG
-    arvore_imprimir(&arvore);
-#endif
 /*
     consultas = fopen("consultas.txt", "r");
     while(!feof(consultas)) {
@@ -126,7 +123,6 @@ int main(void) {
     }
 */
     fclose(arvore.fp);
-    fclose(consultas);
     fclose(dataFile);
     return 0;
 }

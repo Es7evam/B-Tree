@@ -236,7 +236,7 @@ int arvore_busca(Arvore *arv, int idBusca) { //ok
     return -1;
 }
 
-void arvore_iniciar(Arvore *arv, bool build) { //ok
+void arvore_iniciar(Arvore *arv, bool build, FILE *fp) { //ok
     arv->paginas = 1;
     arv->raiz = 0;
     arv->ponteiro = -TAMANHO_PAGINA; /* Começa com -tampag para facilitar */
@@ -257,23 +257,32 @@ void arvore_iniciar(Arvore *arv, bool build) { //ok
 
     if(build){
         pagina_escrever(arv, &pag, -1);
-        arvore_build(arv);
+        arvore_build(arv, fp);
     }
 
 }
 
-void arvore_build(Arvore *arv){
+void arvore_build(Arvore *arv, FILE *fp){
     int offset;
     //lembrar flag aqui ajeitar
     tRegistro tmp;
     entrada entradaTmp;
-    while(!feof(arv->fp)){
-        //lendo no arquivo
-        tmp = arquivo_ler(arv, arv->fp, &offset);
 
+    bool go = true;
+    if(fgetc(fp) == EOF){
+        go = false;
+    }
+    rewind(fp);
+    while(!feof(fp) && go){
+        //lendo no arquivo
+        tmp = arquivo_ler(arv, fp, &offset);
         //coloca na árvore
         entradaTmp.id = tmp.id;
         entradaTmp.byte_offset = offset; // Pega o byte offset, adquirido anteriormente.
+
+#ifdef DEBUG
+        cout << entradaTmp.id << ": " << entradaTmp.byte_offset << endl;
+#endif
         arvore_inserir(arv, entradaTmp);
     }
 }
@@ -398,6 +407,7 @@ void busca(Arvore *arv, int idBusca){
 }
 
 void printMenu(){
+    clear();
     cout << "Menu" << endl;
     cout << "1) Criar Índice" << endl;
     cout << "2) Inserir Música" << endl;
