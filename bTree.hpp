@@ -53,33 +53,85 @@ typedef struct Arvore {
 char buffer[2000000] = {};
 #endif
 
+/* Funções de página */
+    /*
+    Escreve a informação de pag na página de determinado número
+    Retorna o 0 se falhar, caso contrário retorna o novo número da página
+    */
 int pagina_escrever(Arvore *arv, Pagina *pag, int pagina); //ok
 
+    /*
+    Lê a página com numeração determinada e guarda a informação em pag
+    Retorna o número da página caso for sucesso.
+    */
 int pagina_ler(Arvore *arv, Pagina *pag, int pagina); //ok
 
-int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai); 
+    /*
+    Faz o split da página, já redistribuindo as chaves e offsets
+    Retorna o pai das páginas splitadas (pode ser uma das duas).      
+    */
+int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai);
 
+    /*
+    Insere um determinado elemento (elem, conjunto de id e offset)
+    A inserção é feita na página pag.
+    Retorna a posição onde será feita a inserção do elemento
+    */ 
 int pagina_inserir(Arvore *arv, Pagina *pag, entrada elem); // ok
 
+
+
+/* Funções da árvore */
+
+    /*
+    Insere elem (par de id e offset) na determinada árvore
+    Todo o tratamnto é feito dentro dessa função.
+    É feita a leitura, split caso necessário, leitura e escrita.
+    Tais ações são realizadas através da chamada das funções de paginas.
+    Retorna a pagina caso ocorra bem, caso contrário retorna 0.
+    */
 int arvore_inserir(Arvore *arv, entrada elem); //ok
 
-//Faz a busca do id na árvore, já printando uma struct com as informações
-void busca(Arvore *arv, int idBusca); 
-
+    /*
+    Busca o idBusca dentro da árvore.
+    Usa chamadas das funções de páginas para isso, de modo iterativo 
+    Retorna o offset do id respectivo, caso não encontre retorna -1.
+    */
 int arvore_busca(Arvore *arv, int idBusca); //ok
 
+    /*
+    Inicializa a árvore.
+    Se build for true, ela construirá a árvore à partir do arquivo de dados
+    Se build for false, apenas inicializa a árvore vazia.
+    */
 void arvore_iniciar(Arvore *arv, bool build); //ok
 
+    /*
+    Constrói a árvore à partir do arquivo de dados
+    */
+void arvore_build(Arvore *arv);
+
+    /*
+    Imprime a árvore de modo iterativo
+    */
+void arvore_imprimir(Arvore *arv);
+
+
+// Função para o cálculo do Byte_Offset à partir do rrn dado.
+int rrnToOffset(int rrn);
+
+/* Funções de manipulação do arquivo de dados */
 //leitura do arquivo de dados
 char *parser(char *buffer, int *pos);
-void arquivo_ler(Arvore *arv, int offset);
+void arquivo_ler(Arvore *arv, FILE*fp, int *offset);
 
 //escrita no arquivo de dados
 int getStrSize(tRegistro *reg, char *buffer);
 void arquivo_escrever(tRegistro *reg);
 
-void arvore_build(Arvore *arv);
 
-void arvore_imprimir(Arvore *arv);
+/* Funções chamadas pelo menu*/
+void insercao(Arvore *arv, int tmpId, string title, string gender);
 
-int rrnToOffset(int rrn);
+//Faz a busca do id na árvore, já printando uma struct com as informações
+void busca(Arvore *arv, int idBusca); 
