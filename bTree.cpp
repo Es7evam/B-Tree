@@ -8,7 +8,7 @@ int pagina_escrever(Arvore *arv, Pagina *pag, int pagina) {
         return arv->ponteiro / TAMANHO_PAGINA;
     }
     else {
-        fseek(arv->fp, pagina*TAMANHO_PAGINA, SEEK_SET); //busca do inicio do arquivo (ajeitar)
+        fseek(arv->fp, pagina*TAMANHO_PAGINA, SEEK_SET); //busca do inicio do arquivo
         fwrite(pag, TAMANHO_PAGINA, 1, arv->fp);
         return pagina;
     }
@@ -110,7 +110,7 @@ int pagina_inserir(Arvore *arv, Pagina *pag, entrada elem) {
     /* Primeiramente, procurar por um lugar vazio no vetor. */
     for(i=0; i < pag->num_chaves && !finalizado; i++ ) {
     	if(pag->entradas[i].id - elem.id > 0){ 
-        //if(strcmp(pag->entradas[i].CEP, elem.CEP) > 0)  { ajeitar
+        //if(strcmp(pag->entradas[i].CEP, elem.CEP) > 0)  { ajeitar (?)
             posicao_ideal = i;
             finalizado = 1;
         }
@@ -237,49 +237,45 @@ int arvore_busca(Arvore *arv, int idBusca) { //ok
 }
 
 void arvore_iniciar(Arvore *arv, bool build) { //ok
-    Pagina pag;
-
     arv->paginas = 1;
     arv->raiz = 0;
     arv->ponteiro = -TAMANHO_PAGINA; /* Começa com -tampag para facilitar */
     arv->fp = NULL;
     
+    Pagina pag;
     pag.num_chaves = 0;
     memset(pag.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));
-    memset(pag.entradas, 0, MAXIMO_CHAVES*sizeof(tRegistro));
+    memset(pag.entradas, 0, MAXIMO_CHAVES*sizeof(entrada));
 
-    pagina_escrever(arv, &pag, -1);
+
+    arv->fp = fopen(INDEX_FILE, "rb+");
+    if(arv->fp == NULL){
+        cout << "Nao existia arquivo de indices, foi criado" << endl;
+        arv->fp = fopen(INDEX_FILE, "wb+"); //ajeitar nome arquivo (talvez rb+)
+
+    }  
 
     if(build){
+        pagina_escrever(arv, &pag, -1);
         arvore_build(arv);
     }
+
 }
 
-void arvore_build(Arvore *arv){ //ajeitar tudo
+void arvore_build(Arvore *arv){
     int offset;
     //lembrar flag aqui ajeitar
     tRegistro tmp;
-    entrada temp; //AJEITAR TUDO
-    rewind(arv->fp);
-    
-    /*
-    while(!feof(DATA_FILE)) { // 0 se final do arquivo
-        offset = ftell(DATA_FILE);
-        tmp = arquivo_ler(arv, DATA_FILE);
+    entrada entradaTmp;
+    while(!feof(arv->fp)){
+        //lendo no arquivo
+        tmp = arquivo_ler(arv, arv->fp, &offset);
 
-        fscanf(DATA_FILE, "%d|", &tamanho)
-        fgets(buff, 1000, DATA_FILE);
-
-        memcpy(temp.CEP, buff, 8);
-
-        //temp.CEP[8] = '\0';
-        //AJEITAR
-
-        temp.id = ids;
-        temp.byte_offset = offset; // Pega o byte offset, adquirido anteriormente.
-        arvore_inserir(&arvore, temp);
+        //coloca na árvore
+        entradaTmp.id = tmp.id;
+        entradaTmp.byte_offset = offset; // Pega o byte offset, adquirido anteriormente.
+        arvore_inserir(arv, entradaTmp);
     }
-    */
 }
 
 void arvore_imprimir(Arvore *arv){
@@ -379,7 +375,7 @@ void insercao(Arvore *arv, int tmpId, string title, string gender){
     int offset = arquivo_escrever(&tmpReg);
 
     elemEntrada.id = tmpId;
-    elemEntrada.byte_offset = offset; // ajeitar
+    elemEntrada.byte_offset = offset; // ajeitar (?)
     arvore_inserir(arv, elemEntrada);
 }
 
@@ -399,4 +395,15 @@ void busca(Arvore *arv, int idBusca){
         cout << "Titulo: " << tmpReg.titulo << endl;
         cout << "Genero: " << tmpReg.genero << endl;
     }
+}
+
+void printMenu(){
+    cout << "Menu" << endl;
+    cout << "1) Criar Índice" << endl;
+    cout << "2) Inserir Música" << endl;
+    cout << "3) Pesquisar Música por ID" << endl;
+    cout << "4) Remover Música por ID" << endl;
+    cout << "5) Mostrar Árvore-B" << endl;
+    cout << "6) Fechar o programa" << endl;
+    cout << "Digite a opcao desejada: ";
 }

@@ -1,52 +1,57 @@
 #include "bTree.hpp"
 
-int main(void) { 
+int main(void) {
+    freopen (LOG_FILE,"w",stderr);
+
     int offset = 0;
     char buff[1000] = {};
-    FILE *DATA_FILE = NULL;
+    FILE *dataFile = NULL;
     FILE *consultas = NULL;
     tRegistro temp;
     Arvore arvore;
 
-    DATA_FILE = fopen("dados.dat", "rb"); //ajeitar nome arquivo
-    if(DATA_FILE == NULL){
-        cout << "Arquivo de dados inexistente!" << endl;
-        cout << "Saindo do programa..." << endl;
-        return -1;
+    bool dadosExiste = true;
+    dataFile = fopen(DATA_FILE, "rb+"); //ajeitar nome arquivo
+    if(dataFile == NULL){
+        cout << "Nao existia arquivo de dados, foi criado um vazio" << endl;
+        dataFile = fopen(DATA_FILE, "wb+");
+        dadosExiste = false;
     }
 
-    arvore_iniciar(&arvore, false); //não constrói, só inicia
     
-    arvore.fp = fopen("indices.dat", "rb+");
-    if(arvore.fp == NULL)
-        arvore.fp = fopen("indices.dat", "wb+"); //ajeitar nome arquivo (talvez rb+)
-
+    arvore_iniciar(&arvore, false); //não constrói, só inicia
 
     int  idTmp;
     string tituloTmp, generoTmp;
-    cout << "Menu\n";
-    cout << "1) Criar Índice\n";
-    cout << "2) Inserir Música\n";
-    cout << "3) Pesquisar Música por ID\n";
-    cout << "4) Remover Música por ID\n";
-    cout << "5) Mostrar Árvore-B\n";
-    cout << "6) Fechar o programa";
     bool stay = true;
     while(stay){
+        printMenu();
         int opt;
         cin >> opt;
         switch(opt){
            case 1: 
+                if(!dadosExiste){
+                    cout << "Arquivo de dados inexistente!" << endl;
+                    cout << "Impossivel construir indice..." << endl;
+
+                    break;
+                }
+                clog << "Execucao da criacao do arquivo de indice " << INDEX_FILE;
+                clog << " com base no arquivo de nome " << DATA_FILE << ".\n";
                 arvore_iniciar(&arvore, true);
                 break;
     
            case 2:
                 cout << "Digite o id da música " << endl;
                 cin >> idTmp;
+                getchar(); //pega o \n após o id
                 cout << "Digite o titulo da musica" << endl;
                 getline(cin, tituloTmp);
                 cout << "Digite o genero da musica" << endl;
                 getline(cin, generoTmp);
+                clog << "Execucao de operacao de INSERCAO de" << idTmp << ", " << tituloTmp;
+                clog << ", " << generoTmp << "." << endl;
+
 #ifdef DEBUG
                 cout << "Debug case 2:" << idTmp << " " << tituloTmp << " " << generoTmp;
 #endif
@@ -75,13 +80,13 @@ int main(void) {
 
 /*
     //MONTANDO ARVORE
-    while(!feof(DATA_FILE)) { // 0 se final do arquivo
-        offset = ftell(DATA_FILE);
+    while(!feof(dataFile)) { // 0 se final do arquivo
+        offset = ftell(dataFile);
         int ids;
         string title;
         string gen;
 
-        fgets(buff, 1000, DATA_FILE);
+        fgets(buff, 1000, dataFile);
         
         memcpy(temp.CEP, buff, 8);
         
@@ -113,8 +118,8 @@ int main(void) {
             printf("%s NAO ENCONTRADO\n", buff);
         }
         else {
-            fseek(DATA_FILE, offset, SEEK_SET);
-            fgets(buff, 1000, DATA_FILE);
+            fseek(dataFile, offset, SEEK_SET);
+            fgets(buff, 1000, dataFile);
             LIMPAR_QUEBRA(buff);
             printf("%s\n", buff);
         }
@@ -122,6 +127,6 @@ int main(void) {
 */
     fclose(arvore.fp);
     fclose(consultas);
-    fclose(DATA_FILE);
+    fclose(dataFile);
     return 0;
 }

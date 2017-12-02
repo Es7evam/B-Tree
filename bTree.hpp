@@ -8,7 +8,9 @@
 #include <sstream> //stringstream
 using namespace std;
 
-//#define DATA_FILE ceps
+#define DATA_FILE "dados.dat" //nome arquivo de dados
+#define INDEX_FILE "indices.dat" //nome arquivo de indices
+#define LOG_FILE "log_EArantes.txt"
 
 #define MAXIMO_CHAVES 4 /* Ordem 5 */
 #define TAMANHO_PAGINA (4*(3*(MAXIMO_CHAVES+1) - 1)) //56 pra ordem 5, 4 é sizeof(int)
@@ -49,9 +51,8 @@ typedef struct Arvore {
     FILE *fp;
 } Arvore;
 
-#ifdef MEMORIA
-/* Buffer de memória */
-char buffer[2000000] = {};
+#ifdef DEBUG
+    #define debug "Chegou aqui\n"
 #endif
 
 /* Funções de página */
@@ -139,3 +140,6 @@ void insercao(Arvore *arv, int tmpId, string title, string gender);
 
 //Faz a busca do id na árvore, já printando uma struct com as informações
 void busca(Arvore *arv, int idBusca); 
+
+//Printa o menu
+void printMenu();
