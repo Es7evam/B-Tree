@@ -15,7 +15,12 @@ using namespace std;
 
 /* ****************** DECLARA«ES DE TIPOS ****************** */
 
-/* Registro de elemento da ·rvore */
+/* Registro de elemento da arvore */
+typedef struct entrada{
+    int id;
+    int byte_offset;
+} entrada;
+
 typedef struct tRegistro {
     int id;
     string titulo;
@@ -25,8 +30,10 @@ typedef struct tRegistro {
 typedef struct Pagina { 
     unsigned short num_chaves;
     
-    int id[MAXIMO_CHAVES];
-    int byte_offset[MAXIMO_CHAVES]; //byte offset do id correspondente
+    entrada entradas[MAXIMO_CHAVES];
+
+    //int id[MAXIMO_CHAVES];
+    //int byte_offset[MAXIMO_CHAVES]; //byte offset do id correspondente
     
     int ponteiros[MAXIMO_CHAVES+1]; //RRN da pagina apontada
 } Pagina;
@@ -42,7 +49,7 @@ typedef struct Arvore {
 #define TAMANHO_PAGINA sizeof(Pagina) //1024
 
 #ifdef MEMORIA
-/* Buffer de memÛria */
+/* Buffer de memória */
 char buffer[2000000] = {};
 #endif
 
@@ -52,9 +59,9 @@ int pagina_ler(Arvore *arv, Pagina *pag, int pagina); //ok
 
 int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai); 
 
-int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem); // ok
+int pagina_inserir(Arvore *arv, Pagina *pag, entrada elem); // ok
 
-int arvore_inserir(Arvore *arv, tRegistro elem); //ok caso split MAXIMO
+int arvore_inserir(Arvore *arv, entrada elem); //ok
 
 //Faz a busca do id na árvore, já printando uma struct com as informações
 void busca(Arvore *arv, int idBusca); 
@@ -63,9 +70,11 @@ int arvore_busca(Arvore *arv, int idBusca); //ok
 
 void arvore_iniciar(Arvore *arv, bool build); //ok
 
+//leitura do arquivo de dados
 char *parser(char *buffer, int *pos);
 void arquivo_ler(Arvore *arv, int offset);
 
+//escrita no arquivo de dados
 int getStrSize(tRegistro *reg, char *buffer);
 void arquivo_escrever(tRegistro *reg);
 
