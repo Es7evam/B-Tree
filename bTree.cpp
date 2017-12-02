@@ -4,29 +4,17 @@
 #include "bTree.hpp"
 
 int pagina_escrever(Arvore *arv, Pagina *pag, int pagina) {
-#ifdef MEMORIA
-    if(pagina < 0) {
-        arv->ponteiro += TAMANHO_PAGINA;
-        memcpy(&buffer[arv->ponteiro], pag, TAMANHO_PAGINA);
-        return arv->ponteiro / TAMANHO_PAGINA;
-    }
-    else {
-        memcpy(&buffer[pagina*TAMANHO_PAGINA], pag, TAMANHO_PAGINA);
-        return pagina;
-    }
-#else
-    if(pagina < 0) {
+    if(pagina < 0) { //se for a primeira página
         arv->ponteiro += TAMANHO_PAGINA;
         fseek(arv->fp, 0, SEEK_END);
         fwrite(pag, TAMANHO_PAGINA, 1, arv->fp);
         return arv->ponteiro / TAMANHO_PAGINA;
     }
     else {
-        fseek(arv->fp, pagina*TAMANHO_PAGINA, SEEK_SET);
+        fseek(arv->fp, pagina*TAMANHO_PAGINA, SEEK_SET); //busca do inicio do arquivo (ajeitar)
         fwrite(pag, TAMANHO_PAGINA, 1, arv->fp);
         return pagina;
     }
-#endif
     return 0;
 }
 
@@ -70,7 +58,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
     /* Insere os elementos da pagina a sofrer 'splitting' na pagina
      * nova e remove os mesmos da pagina original. */
     for(i = medio+1; i < MAXIMO_CHAVES; i++) {
-        /* i-(medio+1) faz com que o laÁo comece em 0 para
+        /* i-(medio+1) faz com que o laço comece em 0 para
          * a pagina nova, que vai receber os novos elementos. */
         pag_nova.entradas[i-(medio+1)] = pag->entradas[i];
         pag->entradas[i].CEP[0] = '\0'; /* Apaga o elemento, 
@@ -135,15 +123,15 @@ int pagina_inserir(Arvore *arv, Pagina *pag, tRegistro elem) {
             finalizado = 1;
         }
     }
-    /* Se no encontrou posiÁo ideal e h· mais de uma chave
-     * no vetor, ento a posiÁo ideal È no final do vetor. */
+    /* Se no encontrou posição ideal e há mais de uma chave
+     * no vetor, ento a posição ideal é no final do vetor. */
     if(posicao_ideal < 0) {
         posicao_ideal = pag->num_chaves-1;
     }
 
     i = posicao_ideal;
 
-    /* Procura um espaÁo vazio. */
+    /* Procura um espaço vazio. */
     while(pag->id[i] != 0) 
     	i++;
 
@@ -181,7 +169,7 @@ int arvore_inserir(Arvore *arv, tRegistro elem) {
 
     while(true) {
         for(int i = 0; i <= pag.num_chaves && !fim_pagina; i++) {
-            /* Checa-se se È o ?ltimo ponteiro da pagina ou se È um local adequado
+            /* Checa-se se é o último ponteiro da pagina ou se é um local adequado
              * a se buscar um ponteiro por pagina */
             //if(i == pag.num_chaves || strcmp(pag.entradas[i].CEP, elem.CEP) > 0) {
         	if(i == pag.num_chaves || pag.id[i] - elem.id > 0){
@@ -213,6 +201,11 @@ int arvore_inserir(Arvore *arv, tRegistro elem) {
     return 0;
 }
 
+void busca(Arvore *arv, int idBusca){
+    int offset = arvore_busca(arv, idBusca);
+    fseek(arv->fp, offset, SEEK_SET);
+}
+
 int arvore_busca(Arvore *arv, int idBusca) { //ok
     Pagina pag;
     int i = 0;
@@ -236,10 +229,10 @@ int arvore_busca(Arvore *arv, int idBusca) { //ok
                 }
             }
         }
-        /* Se saiu do laÁo, ou È porque achamos uma pagina e vamos
-         * comeÁar a leitura nela (finalizado_pagina = 1) ou
-         * È porque no encontramos candidatos para tal. Fazer uma
-         * ?ltima tentativa no ponteiro p+1. Se ele no existir,
+        /* Se saiu do loop, ou é porque achamos uma pagina e vamos
+         * começar a leitura nela (finalizado_pagina = 1) ou
+         * é porque no encontramos candidatos para tal. Fazer uma
+         * última tentativa no ponteiro p+1. Se ele no existir,
          * terminamos uma busca que no achou. */
         if(finalizado_pagina) {
             finalizado_pagina = 0;
@@ -255,7 +248,7 @@ int arvore_busca(Arvore *arv, int idBusca) { //ok
     return -1;
 }
 
-void arvore_iniciar(Arvore *arv) { //ok
+void arvore_iniciar(Arvore *arv, bool build) { //ok
     Pagina pag;
 
     arv->paginas = 1;
@@ -268,6 +261,96 @@ void arvore_iniciar(Arvore *arv) { //ok
     memset(pag.entradas, 0, MAXIMO_CHAVES*sizeof(tRegistro));
 
     pagina_escrever(arv, &pag, -1);
+
+    if(build){
+        arvore_build(arv);
+    }
+}
+
+//LER ARQUIVO DE DADOS
+
+
+
+    char *parser(char *buffer, int *pos) {
+        int posi = *pos;
+
+        while(buffer[*pos]!='|')
+            (*pos)++;
+        buffer[*pos] = '\0';
+        (*pos)++;
+        return &buffer[posi];
+    }
+
+    void arquivo_ler(Arvore *arv, int offset, FILE *fp){
+        int tamanho, pos;
+        char buffer[300];
+        tRegistro reg;
+
+        while (fread(&tamanho, sizeof(tamanho), 1, fp)) {
+            fread(buffer, tamanho, 1, fp);
+            pos = 0;
+            sscanf(parser(buffer, &pos), "%d", &reg.id);
+            strcpy(reg.titulo, parser(buffer, &pos));
+            strcpy(reg.genero, parser(buffer, &pos));
+
+            #ifdef DEBUG
+                printf("%d %s %s\n", reg.id, reg.titulo, reg.genero);
+            #endif
+        }
+    }
+
+    int getStrSize(tRegistro *reg, char *buffer){
+        sprintf(buffer, "%d|%s|%s|", reg->id, reg->titulo, reg->genero);
+        return buffer.size();
+    }
+
+    void arquivo_escrever(tRegistro *reg){
+        FILE *fp;
+        fp = fopen("dados.dat", "ab");
+
+        char buffer[300];
+
+        //escrita no arquivo
+        int tamanho = getStrSize(reg, buffer);
+        fwrite(&tamanho, sizeof(tamanho), 1, fp);
+        fwrite(buffer, tamanho, 1, fp);
+    }
+
+void arvore_build(Arvore *arv){
+    int offset;
+    //lembrar flag aqui ajeitar
+
+    while (fread(&size, sizeof(size), 1, fd)) {
+        fread(buffer, size, 1, fd);
+        pos = 0;
+        strcpy(e2.nome, parser(buffer, &pos));
+        strcpy(e2.sobrenome, parser(buffer, &pos));
+        strcpy(e2.rua, parser(buffer, &pos));
+        sscanf(parser(buffer, &pos), "%d", &e2.numero);
+        printf("%s %s %s %d\n", e2.nome, e2.sobrenome, e2.rua, e2.numero);
+    }
+
+    while(!feof(DATA_FILE)) { // 0 se final do arquivo
+        offset = ftell(DATA_FILE);
+        int ids;
+        string title;
+        string gen;
+
+        fscanf(DATA_FILE, "%d|", &tamanho)
+        fgets(buff, 1000, DATA_FILE);
+
+        memcpy(temp.CEP, buff, 8);
+
+        //temp.CEP[8] = '\0';
+        //AJEITAR
+
+        temp.id = ids;
+        temp.titulo = title;
+        temp.genero = gen;
+        temp.byte_offset = offset; /* Pega o byte offset, adquirido anteriormente. */
+        arvore_inserir(&arvore, temp);
+    }
+
 }
 
 void arvore_imprimir(Arvore *arv){
@@ -285,4 +368,8 @@ void arvore_imprimir(Arvore *arv){
         printf("ponteiro[%d]: = %d\n", j, pag.ponteiros[j]);
         printf("--------------------\n");
     }
+}
+
+int rrnToOffset(int rrn){
+    return INT_SIZE + rrn*TAMANHO_PAGINA;
 }
