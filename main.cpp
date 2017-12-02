@@ -1,7 +1,7 @@
 #include "bTree.hpp"
 
 int main(void) { 
-    long offset = 0;
+    int offset = 0;
     char buff[1000] = {};
     FILE *DATA_FILE = NULL;
     FILE *consultas = NULL;
@@ -15,14 +15,15 @@ int main(void) {
         return -1;
     }
 
-    arvore_iniciar(&arvore);
+    arvore_iniciar(&arvore, false); //não constrói, só inicia
     
     arvore.fp = fopen("indices.dat", "rb+");
     if(arvore.fp == NULL)
         arvore.fp = fopen("indices.dat", "wb+"); //ajeitar nome arquivo (talvez rb+)
 
 
-    int idBusca;
+    int  idTmp;
+    string tituloTmp;, generoTmp;
     cout << "Menu\n";
     cout << "1) Criar Índice\n";
     cout << "2) Inserir Música\n";
@@ -35,19 +36,23 @@ int main(void) {
         int opt;
         cin >> opt;
         switch(opt){
-    
            case 1: 
-                criar_Indice();
-                arvore_iniciar();
+                arvore_iniciar(&arvore, true);
                 break;
     
            case 2:
-                inserir();
+                cout << "Digite o id da música " << endl;
+                cin >> idTmp;
+                cout << "Digite o titulo da musica" << endl;
+                getline(cin, tituloTmp);
+                cout << "Digite o genero da musica" << endl;
+                getline(cin, generoTmp);
+                insercao(&arvore, id, string tituloTmp, string generoTmp, offset);
                 break;
             
             case 3:
-                cin >> idBusca;
-                busca(Arvore *arv, int idBusca);
+                cin >> idTmp;
+                busca(&arvore, int idTmp);
                 break;
             
             case 4:
@@ -55,6 +60,7 @@ int main(void) {
                 break;
             
             case 5:
+                arvore_imprimir(&arvore);
                 break;
             
             case 6:

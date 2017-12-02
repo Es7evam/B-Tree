@@ -19,14 +19,9 @@ int pagina_escrever(Arvore *arv, Pagina *pag, int pagina) {
 }
 
 int pagina_ler(Arvore *arv, Pagina *pag, int pagina) {
-#ifdef MEMORIA
-    memcpy(pag, &buffer[pagina*TAMANHO_PAGINA], TAMANHO_PAGINA);
-    return pagina;
-#else
     fseek(arv->fp, pagina*TAMANHO_PAGINA, SEEK_SET);
     fread(pag, TAMANHO_PAGINA, 1, arv->fp);
     return pagina;
-#endif
 }
 
 int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai) {
@@ -188,7 +183,7 @@ int arvore_inserir(Arvore *arv, entrada elem) {
                 else {
                     /* Inserir na pagina, caso a mesma no esteja vazia. */
 #ifdef DEBUG
-                    printf("Inserindo %s na pagina %d\n", elem.CEP, pagina_atual);
+                    printf("Inserindo %s na pagina %d\n", elem.id, pagina_atual);
 #endif
                     pagina_inserir(arv, &pag, elem);
                     pagina_escrever(arv, &pag, pagina_atual);
@@ -201,10 +196,6 @@ int arvore_inserir(Arvore *arv, entrada elem) {
     return 0;
 }
 
-void busca(Arvore *arv, int idBusca){
-    int offset = arvore_busca(arv, idBusca);
-    fseek(arv->fp, offset, SEEK_SET);
-}
 
 int arvore_busca(Arvore *arv, int idBusca) { //ok
     Pagina pag;
@@ -266,57 +257,8 @@ void arvore_iniciar(Arvore *arv, bool build) { //ok
         arvore_build(arv);
     }
 }
-    
-//ESCREVER NO ARQUIVO DE DADOS
-int getStrSize(tRegistro *reg, char *buffer){
-    sprintf(buffer, "%d|%s|%s|", reg->id, reg->titulo, reg->genero);
-    return buffer.size();
-}
 
-void arquivo_escrever(tRegistro *reg){
-    FILE *fp;
-    fp = fopen("dados.dat", "ab"); // abre no final
-
-    char buffer[300];
-
-    //escrita no arquivo
-    int tamanho = getStrSize(reg, buffer);
-    fwrite(&tamanho, sizeof(tamanho), 1, fp);
-    fwrite(buffer, tamanho, 1, fp);
-}   
-
-//LER DO ARQUIVO DE DADOS
-char *parser(char *buffer, int *pos) {
-    int posi = *pos;
-
-    while(buffer[*pos]!='|')
-        (*pos)++;
-    buffer[*pos] = '\0';
-    (*pos)++;
-    return &buffer[posi];
-}
-
-tRegistro arquivo_ler(Arvore *arv, FILE *fp){
-    int tamanho, pos;
-    char buffer[300];
-    tRegistro reg;
-
-    fread(&tamanho, sizeof(tamanho), 1, fp)
-    fread(buffer, tamanho, 1, fp);
-    pos = 0;
-    sscanf(parser(buffer, &pos), "%d", &reg.id);
-    strcpy(reg.titulo, parser(buffer, &pos));
-    strcpy(reg.genero, parser(buffer, &pos));
-
-#ifdef DEBUG
-    printf("Leu id:%d, titulo:%s, genero:%s\n", reg.id, reg.titulo, reg.genero);
-#endif
-
-    return reg;
-}
-
-
-void arvore_build(Arvore *arv){
+void arvore_build(Arvore *arv){ //ajeitar tudo
     int offset;
     //lembrar flag aqui ajeitar
     tRegistro tmp;
@@ -358,5 +300,79 @@ void arvore_imprimir(Arvore *arv){
 }
 
 int rrnToOffset(int rrn){
-    return INT_SIZE + rrn*TAMANHO_PAGINA;
+    return (sizeof(int) + rrn*TAMANHO_PAGINA);
+}
+
+//ESCREVER NO ARQUIVO DE DADOS
+int getStrSize(tRegistro *reg, char *buffer){
+    sprintf(buffer, "%d|%s|%s|", reg->id, reg->titulo, reg->genero);
+    return buffer.size();
+}
+
+int arquivo_escrever(tRegistro *reg){
+    FILE *fp;
+    fp = fopen("dados.dat", "ab"); // abre no final
+
+    char buffer[300];
+    int offset;
+    offset = ftell(fp);
+    
+    //escrita no arquivo
+    int tamanho = getStrSize(reg, buffer); //Coloca escrito no buffer e retorna tamanho
+    fwrite(&tamanho, sizeof(tamanho), 1, fp);
+    fwrite(buffer, tamanho, 1, fp);
+
+    return offset; //retorna offset de onde foi escrito
+}   
+
+//LER DO ARQUIVO DE DADOS
+char *parser(char *buffer, int *pos) {
+    int posi = *pos;
+
+    while(buffer[*pos]!='|')
+        (*pos)++;
+    buffer[*pos] = '\0';
+    (*pos)++;
+    return &buffer[posi];
+}
+
+tRegistro arquivo_ler(Arvore *arv, FILE *fp, int *offset){
+    int tamanho, pos;
+    char buffer[300];
+    tRegistro reg;
+
+    (*offset) = ftell(fp);
+    fread(&tamanho, sizeof(tamanho), 1, fp)
+    fread(buffer, tamanho, 1, fp);
+    pos = 0;
+    sscanf(parser(buffer, &pos), "%d", &reg.id);
+    strcpy(reg.titulo, parser(buffer, &pos));
+    strcpy(reg.genero, parser(buffer, &pos));
+
+#ifdef DEBUG
+    printf("Leu id:%d, titulo:%s, genero:%s\n", reg.id, reg.titulo, reg.genero);
+#endif
+
+    return reg;
+}
+
+void insercao(Arvore *arv, int tmpId, string title, string gender){
+    tRegistro tmpReg;
+    entrada elemEntrada;
+    
+    //Atribuindo valores ao registro
+    tmpReg.id = tmpId;
+    tmpReg.titulo = title;
+    tmpReg.genero = gender;
+
+    int offset = arquivo_escrever(&reg);
+
+    elemEntrada.id = tmpId;
+    elemEntrada.byte_offset = offset; // ajeitar
+    arvore_inserir(arv, elemEntrada);
+}
+
+void busca(Arvore *arv, int idBusca){
+    int offset = arvore_busca(arv, idBusca);
+    fseek(arv->fp, offset, SEEK_SET);
 }
