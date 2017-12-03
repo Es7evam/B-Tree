@@ -19,10 +19,11 @@ int main(void) {
     }
 
     
-    arvore_iniciar(&arvore, false, dataFile); //não constrói, só inicia
+    arvore_iniciar(&arvore, true, dataFile); //não constrói, só inicia
+    //ajeitar
 
     int  idTmp;
-    string tituloTmp, generoTmp;
+    string tituloTmp, generoTmp, strNull;
     bool stay = true;
     while(stay){
         printMenu();
@@ -47,9 +48,17 @@ int main(void) {
            case 2:
                 cout << "Digite o id da música " << endl;
                 cin >> idTmp;
+                while(cin.fail()) {
+                    cout << "Digite um valor inteiro!" << endl;
+                    cin.clear();
+                    std::cin.ignore(256,'\n');
+                    cin >> idTmp;
+                }
+
                 getchar(); //pega o \n após o id
                 cout << "Digite o titulo da musica" << endl;
                 getline(cin, tituloTmp);
+
                 cout << "Digite o genero da musica" << endl;
                 getline(cin, generoTmp);
                 clog << "Execucao de operacao de INSERCAO de " << idTmp << ", " << tituloTmp;
@@ -61,10 +70,12 @@ int main(void) {
             case 3:
                 cout << "Digite o id da musica que quer buscar: ";
                 cin >> idTmp;
+                clog << "Execucao de operacao de PESQUISA de " << idTmp << "." << endl;
                 busca(&arvore, idTmp, dataFile);
                 break;
             
             case 4:
+                cout << "Ainda não implementada :(" << endl << endl;
                 //a implementar
                 break;
             
@@ -75,7 +86,23 @@ int main(void) {
             case 6:
                 stay = false;
                 break;
+
+#ifdef DEBUG
+            case 7:
+                fclose(arvore.fp);
+                fclose(dataFile);
+                arvore.fp = fopen(INDEX_FILE, "wb+");
+                dataFile = fopen(DATA_FILE, "wb+");
+                arvore_iniciar(&arvore, true, dataFile);
+                break;
+#endif
+
+            default:
+                cout << "Digite um valor valido" << endl;
+                break;
         }
+        fflush(arvore.fp);
+        fflush(dataFile);
     }
 #ifdef DEBUG
     //arvore_imprimir(&arvore);
