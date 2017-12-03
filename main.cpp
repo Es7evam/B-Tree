@@ -28,6 +28,9 @@ int main(void) {
         printMenu();
         int opt;
         cin >> opt;
+#ifdef DEBUG
+        cout << endl << endl;
+#endif
         switch(opt){
            case 1: 
                 if(!dadosExiste){

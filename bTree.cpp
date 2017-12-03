@@ -184,6 +184,10 @@ int arvore_inserir(Arvore *arv, entrada elem) {
 #endif
                     pagina_inserir(arv, &pag, elem);
                     pagina_escrever(arv, &pag, pagina_atual);
+#ifdef DEBUG
+                    cout << "Inseriu " << elem.id << " na pagina " << pagina_atual << endl;
+#endif
+
                     return pagina_atual; /* Ponto de saída da funçao, apos a inserçao. */
                 }
             }
@@ -248,14 +252,17 @@ void arvore_iniciar(Arvore *arv, bool build, FILE *fp) { //ok
     memset(pag.entradas, 0, MAXIMO_CHAVES*sizeof(entrada));
 
 
-    arv->fp = fopen(INDEX_FILE, "rb+");
+    arv->fp = fopen(INDEX_FILE, "r+b");
     if(arv->fp == NULL){
         cout << "Nao existia arquivo de indices, foi criado" << endl;
-        arv->fp = fopen(INDEX_FILE, "wb+"); //ajeitar nome arquivo (talvez rb+)
+        arv->fp = fopen(INDEX_FILE, "w+b"); //ajeitar nome arquivo (talvez rb+)
 
     }  
 
     if(build){
+        fclose(arv->fp);
+        arv->fp = fopen(INDEX_FILE, "w+b");
+        rewind(fp);
         pagina_escrever(arv, &pag, -1);
         arvore_build(arv, fp);
     }
@@ -270,18 +277,22 @@ void arvore_build(Arvore *arv, FILE *fp){
 
     bool go = true;
     if(fgetc(fp) == EOF){
-        go = false;
+        go = false; //arquivo vazio
     }
     rewind(fp);
     while(!feof(fp) && go){
         //lendo no arquivo
         tmp = arquivo_ler(arv, fp, &offset);
+        if(offset == -1){
+            break;
+        }
+
         //coloca na árvore
         entradaTmp.id = tmp.id;
         entradaTmp.byte_offset = offset; // Pega o byte offset, adquirido anteriormente.
 
 #ifdef DEBUG
-        cout << entradaTmp.id << ": " << entradaTmp.byte_offset << endl;
+        cout << "Build: " << entradaTmp.id << ": " << entradaTmp.byte_offset << endl;
 #endif
         arvore_inserir(arv, entradaTmp);
     }
@@ -297,7 +308,8 @@ void arvore_imprimir(Arvore *arv){
         printf("Imprimindo pagina %d\n", i);
         pagina_ler(arv, &pag, i);
         for(j = 0; j < pag.num_chaves; j++) {
-            printf("ponteiro[%d]: = %d\nelemento[%d] = %d\n", j, pag.ponteiros[j], j, pag.entradas[j].id); //ajeitar(?)
+            printf("ponteiro[%d]: = %d\n", j, pag.ponteiros[j]);
+                printf("elemento[%d] = %d:%d\n", j, pag.entradas[j].id, pag.entradas[j].byte_offset); //ajeitar(?)
         }
         printf("ponteiro[%d]: = %d\n", j, pag.ponteiros[j]);
         printf("--------------------\n");
@@ -356,14 +368,32 @@ tRegistro arquivo_ler(Arvore *arv, FILE *fp, int *offset){
 
     (*offset) = ftell(fp);
     fread(&tamanho, sizeof(tamanho), 1, fp);
+    if(feof(fp)){
+#ifdef DEBUG
+        cout << "Chegou no final do arquivo" << endl << endl;
+#endif
+        (*offset) = -1;
+        return reg;
+    }
     fread(buffer, tamanho, 1, fp);
+
+
+#ifdef DEBUG
+    cout << "tamanho: " << tamanho << ", buffer: " << buffer << endl;
+#endif
     pos = 0;
     sscanf(parser(buffer, &pos), "%d", &reg.id);
+#ifdef DEBUG
+    //cout << "chegou aqui1" << endl;
+#endif
     string tituloTmp(parser(buffer, &pos));
     string generoTmp(parser(buffer, &pos));
 
-    //strcpy(reg.titulo, parser(buffer, &pos)); ajeitar (remover, ou não)
-    //strcpy(reg.genero, parser(buffer, &pos));
+#ifdef DEBUG
+   // cout << "chegou aqui2" << endl;
+#endif
+    reg.titulo = tituloTmp;
+    reg.genero = generoTmp;
 
 #ifdef DEBUG
     cout << "Leu id: " << reg.id << ", titulo: " << reg.titulo << ", genero: " << reg.genero << endl;
@@ -407,7 +437,13 @@ void busca(Arvore *arv, int idBusca){
 }
 
 void printMenu(){
+#ifndef DEBUG
     clear();
+else
+    cout << endl << endl;
+#endif
+
+
     cout << "Menu" << endl;
     cout << "1) Criar Índice" << endl;
     cout << "2) Inserir Música" << endl;
