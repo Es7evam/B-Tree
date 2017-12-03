@@ -302,6 +302,7 @@ void arvore_imprimir(Arvore *arv){
     Pagina pag;
     int i, j;
 
+    printf("--------------------\n");
     printf("Raiz: %d\n", arv->raiz);
     printf("Imprimindo %d paginas\n", arv->paginas);
     for(i = 0; i < arv->paginas; i++) {
@@ -367,6 +368,7 @@ tRegistro arquivo_ler(Arvore *arv, FILE *fp, int *offset){
     tRegistro reg;
 
     (*offset) = ftell(fp);
+    cout << "Offset lido: " << *offset << endl;
     fread(&tamanho, sizeof(tamanho), 1, fp);
     if(feof(fp)){
 #ifdef DEBUG
@@ -375,23 +377,23 @@ tRegistro arquivo_ler(Arvore *arv, FILE *fp, int *offset){
         (*offset) = -1;
         return reg;
     }
+#ifdef DEBUG
+    if(tamanho == 0){
+        cout << "tamanho 0, deu ruim" << endl;
+        return reg;
+    }
+#endif
+
+
     fread(buffer, tamanho, 1, fp);
-
-
 #ifdef DEBUG
     cout << "tamanho: " << tamanho << ", buffer: " << buffer << endl;
 #endif
     pos = 0;
     sscanf(parser(buffer, &pos), "%d", &reg.id);
-#ifdef DEBUG
-    //cout << "chegou aqui1" << endl;
-#endif
     string tituloTmp(parser(buffer, &pos));
     string generoTmp(parser(buffer, &pos));
 
-#ifdef DEBUG
-   // cout << "chegou aqui2" << endl;
-#endif
     reg.titulo = tituloTmp;
     reg.genero = generoTmp;
 
@@ -420,10 +422,15 @@ void insercao(Arvore *arv, int tmpId, string title, string gender){
 
 void busca(Arvore *arv, int idBusca){
     int offset = arvore_busca(arv, idBusca);
+#ifdef DEBUG
+    cout << "Offset: " << offset << endl;
+#endif
     if(offset == -1){
         cout << "Musica com o id " << idBusca << " nao encontrada!" << endl;
         return;
     }else{
+        
+        rewind(arv->fp);
         fseek(arv->fp, offset, SEEK_SET);
 
         tRegistro tmpReg;

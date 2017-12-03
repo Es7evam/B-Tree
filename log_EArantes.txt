@@ -1,1 +1,25 @@
 Execucao de operacao de INSERCAO de 7, rockito, metal melodico.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao de operacao de INSERCAO de 10, Despacito, Rock Melodico.
+Execucao de operacao de INSERCAO de 1, Despacido, Pop Rock.
+Execucao de operacao de INSERCAO de 35, teste2, generotests.
+Execucao de operacao de INSERCAO de 2, teste2, teste2gen.
+Execucao de operacao de INSERCAO de 2, teste2, teste2gen.
+Execucao de operacao de INSERCAO de 3, teste, teste2.
+Execucao de operacao de INSERCAO de 5, teste, rock a.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao de operacao de INSERCAO de 1, Testeum, TestegenUm.
+Execucao de operacao de INSERCAO de 2, testedois, testeGenDois.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao de operacao de INSERCAO de 3, testeTres, Genero3.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
+Execucao da criacao do arquivo de indice indices.dat com base no arquivo de dados dados.dat.
