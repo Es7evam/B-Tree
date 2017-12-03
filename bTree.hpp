@@ -137,7 +137,7 @@ tRegistro arquivo_ler(Arvore *arv, FILE*fp, int *offset);
 void insercao(Arvore *arv, int tmpId, string title, string gender);
 
 //Faz a busca do id na árvore, já printando uma struct com as informações
-void busca(Arvore *arv, int idBusca); 
+void busca(Arvore *arv, int idBusca, FILE *fp); 
 
 //Printa o menu
 void printMenu();

@@ -420,7 +420,7 @@ void insercao(Arvore *arv, int tmpId, string title, string gender){
     arvore_inserir(arv, elemEntrada);
 }
 
-void busca(Arvore *arv, int idBusca){
+void busca(Arvore *arv, int idBusca, FILE *fp){
     int offset = arvore_busca(arv, idBusca);
 #ifdef DEBUG
     cout << "Offset: " << offset << endl;
@@ -430,11 +430,11 @@ void busca(Arvore *arv, int idBusca){
         return;
     }else{
         
-        rewind(arv->fp);
-        fseek(arv->fp, offset, SEEK_SET);
+        rewind(fp);
+        fseek(fp, offset, SEEK_SET);
 
         tRegistro tmpReg;
-        tmpReg = arquivo_ler(arv, arv->fp, &offset);
+        tmpReg = arquivo_ler(arv, fp, &offset);
 
         cout << "Musica encontrada" << endl;
         cout << "Id: " << tmpReg.id << endl;

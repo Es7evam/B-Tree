@@ -61,7 +61,7 @@ int main(void) {
             case 3:
                 cout << "Digite o id da musica que quer buscar: ";
                 cin >> idTmp;
-                busca(&arvore, idTmp);
+                busca(&arvore, idTmp, dataFile);
                 break;
             
             case 4:
