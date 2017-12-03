@@ -14,7 +14,6 @@ using namespace std;
 
 #define MAXIMO_CHAVES 4 /* Ordem 5 */
 #define TAMANHO_PAGINA (4*(3*(MAXIMO_CHAVES+1) - 1)) //56 pra ordem 5, 4 é sizeof(int)
-#define clear() printf("\033[H\033[J")
 
 /* ****************** DECLARA«ES DE TIPOS ****************** */
 
