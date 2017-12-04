@@ -31,15 +31,9 @@ typedef struct tRegistro {
 
 typedef struct Pagina { 
     int num_chaves;
-    
     entrada entradas[MAXIMO_CHAVES];
-
-    //int id[MAXIMO_CHAVES];
-    //int byte_offset[MAXIMO_CHAVES]; //byte offset do id correspondente
-    
     int ponteiros[MAXIMO_CHAVES+1]; //RRN da pagina apontada
 } Pagina;
-
 
 typedef struct Arvore {
     int paginas;
@@ -47,6 +41,11 @@ typedef struct Arvore {
     int ponteiro;
     FILE *fp;
 } Arvore;
+
+typedef struct Flag {
+    int flagOk;
+    int raiz;
+} Flag;
 
 #ifdef DEBUG
     #define debug "Chegou aqui\n"
@@ -124,19 +123,25 @@ void arvore_build(Arvore *arv, FILE *fp);
 
 
 
-// Função para o cálculo do Byte_Offset à partir do rrn dado.
+    // Função para o cálculo do Byte_Offset à partir do rrn dado.
 int rrnToOffset(int rrn);
 
-//escrita no arquivo de dados
+    //escrita no arquivo de dados
 int getStrSize(tRegistro *reg, char *buffer);
 int arquivo_escrever(tRegistro *reg);
 
 /* Funções de manipulação do arquivo de dados */
-//leitura do arquivo de dados
+    //leitura do arquivo de dados
 char *parser(char *buffer, int *pos);
 tRegistro arquivo_ler(Arvore *arv, FILE*fp, int *offset);
 
 /* Funções chamadas pelo menu*/
+    /*
+    Insere as determinadas informações no arquivo de dados e na árvore
+    tmpId é o id inserido
+    title é o título inserido
+    gender é o genero inserido
+    */
 void insercao(Arvore *arv, int tmpId, string title, string gender);
 
 //Faz a busca do id na árvore, já printando uma struct com as informações
@@ -150,3 +155,7 @@ void arvore_imprimir(Arvore *arv);
 
 //Printa o menu
 void printMenu();
+
+void arvore_debug(Arvore *arv);
+
+void pagina_imprimir(Arvore *arv, int idPag);

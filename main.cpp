@@ -21,7 +21,7 @@ int main(void) {
     
     arvore_iniciar(&arvore, true, dataFile); //não constrói, só inicia
     //ajeitar
-
+    arvore_debug(&arvore);
     int  idTmp;
     string tituloTmp, generoTmp, strNull;
     bool stay = true;
