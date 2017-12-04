@@ -48,12 +48,12 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
     Pagina pag_nova;
     Pagina pag_pai;
     int local = 0; /* local onde ser· inserido o elemento promovido */
-    int nova = 0; /* nro nova página */
+    int nova = 0; /* nro nova pagina */
     int medio = (MAXIMO_CHAVES)/2; /* posiçao mediana */
     int i = 0;
 
     /* Iniciar as paginas novas
-     * Se o pai ja existir, lê, caso contrário cria*/
+     * Se o pai ja existir, lê, caso contrario cria*/
     if(pai >= 0) {
         pagina_ler(arv, &pag_pai, pai);
     }
@@ -85,8 +85,8 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
             ok = true;
         }
     }
-    //Se no encontrou posiçao ideal e há mais de uma chave
-    // no vetor, entao a posiçao ideal é no final do vetor.
+    //Se no encontrou posiçao ideal e ha mais de uma chave
+    // no vetor, entao a posiçao ideal eh no final do vetor.
     if(posicao_ideal < 0) {
         posicao_ideal = MAXIMO_CHAVES-1;
     }
@@ -135,7 +135,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
     cout << "Nova: " << nova << endl;
 #endif
 
-    /* Início do "promoting". */
+    /* Inicio do "promoting". */
     /* Agora insere o elemento mediano na pagina pai. */
     clog << "Chave " << tmpEntrada[medio].id << " promovida" << endl;
     local = pagina_inserir(arv, &pag_pai, tmpEntrada[medio]);
@@ -152,7 +152,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
         pag->entradas[i] = tmpEntrada[i];
     }
 
-    /* Atualiza a ·rvore */
+    /* Atualiza a arvore */
     if(pai == -1) 
     	arv->paginas += 2; 
     else 
@@ -189,8 +189,8 @@ int pagina_inserir(Arvore *arv, Pagina *pag, entrada elem) {
             finalizado = 1;
         }
     }
-    /* Se no encontrou posiçao ideal e há mais de uma chave
-     * no vetor, ento a posiçao ideal é no final do vetor. */
+    /* Se no encontrou posiçao ideal e ha mais de uma chave
+     * no vetor, ento a posiçao ideal eh no final do vetor. */
     if(posicao_ideal < 0) {
         posicao_ideal = pag->num_chaves-1;
     }
@@ -243,7 +243,7 @@ int arvore_inserir(Arvore *arv, entrada elem) {
 
     while(true) {
         for(int i = 0; i <= pag.num_chaves && !fim_pagina; i++) {
-            /* Checa-se se é o último ponteiro da pagina ou se é um local adequado
+            /* Checa-se se eh o ultimo ponteiro da pagina ou se eh um local adequado
              * a se buscar um ponteiro por pagina */
             //if(i == pag.num_chaves || strcmp(pag.entradas[i].CEP, elem.CEP) > 0) { ajeitar
         	if(i == pag.num_chaves || pag.entradas[i].id - elem.id > 0){
@@ -275,7 +275,7 @@ int arvore_inserir(Arvore *arv, entrada elem) {
 #ifdef DEBUG
 #endif
 
-                    return pagina_atual; /* Ponto de saída da funçao, apos a inserçao. */
+                    return pagina_atual; /* Ponto de saida da funçao, apos a inserçao. */
                 }
             }
         }
@@ -295,7 +295,7 @@ int arvore_busca(Arvore *arv, int idBusca) { //ok
     while(!finalizado_arvore) {
         /* Itera entre os ponteiros da ·rvore. */
         for(i = 0; i < pag.num_chaves && !finalizado_pagina; i++) {
-        	//se o buscado é menor que o atual entra
+        	//se o buscado eh menor que o atual entra
             if(pag.entradas[i].id - idBusca > 0) {
                 if(pag.ponteiros[i] >= 0) {
                     pagina_ler(arv, &pag, pag.ponteiros[i]);
@@ -308,10 +308,10 @@ int arvore_busca(Arvore *arv, int idBusca) { //ok
                 }
             }
         }
-        /* Se saiu do loop, ou é porque achamos uma pagina e vamos
+        /* Se saiu do loop, ou eh porque achamos uma pagina e vamos
          * começar a leitura nela (finalizado_pagina = 1) ou
-         * é porque no encontramos candidatos para tal. Fazer uma
-         * última tentativa no ponteiro p+1. Se ele no existir,
+         * eh porque no encontramos candidatos para tal. Fazer uma
+         * ultima tentativa no ponteiro p+1. Se ele no existir,
          * terminamos uma busca que no achou. */
         if(finalizado_pagina) {
             finalizado_pagina = 0;
@@ -416,7 +416,7 @@ void arvore_build(Arvore *arv, FILE *fp, Flag *fflag){
             break;
         }
 
-        //coloca na árvore
+        //coloca na arvore
         entradaTmp.id = tmp.id;
         entradaTmp.byte_offset = offset; // Pega o byte offset, adquirido anteriormente.
 
@@ -568,7 +568,7 @@ void arvore_imprimir(Arvore *arv, Flag *fflag){
     Pagina pag;
     int i, j;
 
-    int *fila = new int(1000); //MAXIMO de nós = 1000;
+    int *fila = new int(1000); //MAXIMO de nos = 1000;
     int filafim = 0, curr=0;
     int *nivel = new int(1000);
     nivel[0] = 0;
@@ -617,11 +617,11 @@ void arvore_imprimir(Arvore *arv, Flag *fflag){
 void printMenu(){
     cout << endl;
     cout << "Menu" << endl;
-    cout << "1) Criar Índice" << endl;
-    cout << "2) Inserir Música" << endl;
-    cout << "3) Pesquisar Música por ID" << endl;
-    cout << "4) Remover Música por ID" << endl;
-    cout << "5) Mostrar Árvore-B" << endl;
+    cout << "1) Criar indice" << endl;
+    cout << "2) Inserir Musica" << endl;
+    cout << "3) Pesquisar Musica por ID" << endl;
+    cout << "4) Remover Musica por ID" << endl;
+    cout << "5) Mostrar arvore-B" << endl;
     cout << "6) Fechar o programa" << endl;
 #ifdef DEBUG
     cout << "7) Apagar arquivos" << endl;

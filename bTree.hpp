@@ -13,7 +13,7 @@ using namespace std;
 #define LOG_FILE "log_EArantes.txt"
 
 #define MAXIMO_CHAVES 4 /* Ordem 5 */
-#define TAMANHO_PAGINA (4*(3*(MAXIMO_CHAVES+1) - 1)) //56 pra ordem 5, 4 é sizeof(int)
+#define TAMANHO_PAGINA (4*(3*(MAXIMO_CHAVES+1) - 1)) //56 pra ordem 5, 4 eh sizeof(int)
 
 /* ****************** DECLARA«ES DE TIPOS ****************** */
 
@@ -53,86 +53,86 @@ typedef struct Flag {
     #define debug "Chegou aqui\n"
 #endif
 
-/* Funções de página */
+/* Funcoes de pagina */
     /*
-    Escreve a informação de pag na página de determinado número
-    Retorna o 0 se falhar, caso contrário retorna o novo número da página
+    Escreve a informacao de pag na pagina de determinado numero
+    Retorna o 0 se falhar, caso contrario retorna o novo numero da pagina
     */
 int pagina_escrever(Arvore *arv, Pagina *pag, int pagina); //ok
 
     /*
-    Lê a página com numeração determinada e guarda a informação em pag
-    Retorna o número da página caso for sucesso.
+    Lê a pagina com numeracao determinada e guarda a informacao em pag
+    Retorna o numero da pagina caso for sucesso.
     */
 int pagina_ler(Arvore *arv, Pagina *pag, int pagina); //ok
 
     /*
     Checa se a ordenacao da pagina esta correta
-    Nao muda-se os ponteiros de lugar pois só ocorre em pag nova
+    Nao muda-se os ponteiros de lugar pois so ocorre em pag nova
     Onde os ponteiros serao -1
     */
 void pagina_check(Pagina *pag);
 
 
     /*
-    Faz o split da página, já redistribuindo as chaves e offsets
-    Retorna o pai das páginas splitadas (pode ser uma das duas).      
+    Faz o split da pagina, ja redistribuindo as chaves e offsets
+    Retorna o pai das paginas splitadas (pode ser uma das duas).      
     */
 int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai);
 
     /*
     Insere um determinado elemento (elem, conjunto de id e offset)
-    A inserção é feita na página pag.
-    Retorna a posição onde será feita a inserção do elemento
+    A insercao eh feita na pagina pag.
+    Retorna a posicao onde sera feita a insercao do elemento
     */ 
 int pagina_inserir(Arvore *arv, Pagina *pag, entrada elem); // ok
 
 
 
-/* Funções da árvore */
+/* Funcoes da arvore */
 
     /*
-    Insere elem (par de id e offset) na determinada árvore
-    Todo o tratamnto é feito dentro dessa função.
-    É feita a leitura, split caso necessário, leitura e escrita.
-    Tais ações são realizadas através da chamada das funções de paginas.
-    Retorna a pagina caso ocorra bem, caso contrário retorna 0.
+    Insere elem (par de id e offset) na determinada arvore
+    Todo o tratamnto eh feito dentro dessa funcao.
+    eh feita a leitura, split caso necessario, leitura e escrita.
+    Tais acoes sao realizadas atravehs da chamada das funcoes de paginas.
+    Retorna a pagina caso ocorra bem, caso contrario retorna 0.
     */
 int arvore_inserir(Arvore *arv, entrada elem); //ok
 
 
     /*
-    Busca o idBusca dentro da árvore.
-    Usa chamadas das funções de páginas para isso, de modo iterativo 
-    Retorna o offset do id respectivo, caso não encontre retorna -1.
+    Busca o idBusca dentro da arvore.
+    Usa chamadas das funcoes de paginas para isso, de modo iterativo 
+    Retorna o offset do id respectivo, caso nao encontre retorna -1.
     */
 int arvore_busca(Arvore *arv, int idBusca); //ok
 
 
     /*
-    Inicializa a árvore.
-    Se build for true, ela construirá a árvore à partir do arquivo de dados
-    Se build for false, apenas inicializa a árvore vazia.
+    Inicializa a arvore.
+    Se build for true, ela construira a arvore a partir do arquivo de dados
+    Se build for false, apenas inicializa a arvore vazia.
     */
 void arvore_iniciar(Arvore *arv, bool build, FILE *fp, Flag *flagTmp); //ok
 
 
     /*
-    Constrói a árvore à partir do arquivo de dados
+    Constroi a arvore a partir do arquivo de dados
     */
 void arvore_build(Arvore *arv, FILE *fp, Flag *fflag);
 
 
 
     /* 
-    Função para o cálculo do Byte_Offset à partir do rrn dado.
+    Funcao para o calculo do Byte_Offset a partir do rrn dado.
     */
 int rrnToOffset(int rrn);
 
-/* Funções de manipulação do arquivo de dados */
+/* Funcoes de manipulacao do arquivo de dados */
 
     /*
-    Monta um buffer com o conteúdo do registrador
+    Monta um buffer com o conteudo do registrador
     Retorna o tamanho do tal buffer para ser escrito
     */
 int getStrSize(tRegistro *reg, char *buffer);
@@ -140,85 +140,85 @@ int getStrSize(tRegistro *reg, char *buffer);
 
     /*
     Escreve o determinado registro no arquivo
-    Usa a função acima para gerar o buffer para a escrita
+    Usa a funcao acima para gerar o buffer para a escrita
     */
 int arquivo_escrever(tRegistro *reg);
 
 
     /*
-    Faz o parsing do buffer e muda a posição de acordo
+    Faz o parsing do buffer e muda a posicao de acordo
     */
 char *parser(char *buffer, int *pos);
 
 
     /*
     Lê no arquivo fp e retorna o registro
-    Usa a função de parsing para obter o registro
+    Usa a funcao de parsing para obter o registro
     */
 tRegistro arquivo_ler(Arvore *arv, FILE*fp, int *offset);
 
 
-/* Funções chamadas pelo menu*/
+/* Funcoes chamadas pelo menu*/
 
     /*
-    Insere as determinadas informações no arquivo de dados e na árvore
-    tmpId é o id inserido
-    title é o título inserido
-    gender é o genero inserido
+    Insere as determinadas informacoes no arquivo de dados e na arvore
+    tmpId eh o id inserido
+    title eh o titulo inserido
+    gender eh o genero inserido
     */
 void insercao(Arvore *arv, int tmpId, string title, string gender, Flag *fflag);
 
 
     /*
-    Faz a busca do id na árvore
-    Printa uma struct com as informações buscadas no log
+    Faz a busca do id na arvore
+    Printa uma struct com as informacoes buscadas no log
     */
 void busca(Arvore *arv, int idBusca, FILE *fp, Flag *fflag); 
 
 
     /*
-    Imprime a árvore usando uma bfs
-    Feita por níveis portanto, usando uma fila
+    Imprime a arvore usando uma bfs
+    Feita por niveis portanto, usando uma fila
     */
 void arvore_imprimir(Arvore *arv, Flag *fflag);
 
 
     /*
-    Imprime o menu para a interação com o usuário
+    Imprime o menu para a interacao com o usuario
     */
 void printMenu();
 
 
     /*
-    Função para debug
-    Imprime algumas informações sobre a árvore
+    Funcao para debug
+    Imprime algumas informacoes sobre a arvore
     */
 void arvore_debug(Arvore *arv);
 
 
     /*
-    Função para debug
-    Imprime a página de RRN passado
+    Funcao para debug
+    Imprime a pagina de RRN passado
     */
 void pagina_imprimir(Arvore *arv, int idPag);
 
-/* Funções relativas à flag para checar se houve problema no problema */
+/* Funcoes relativas a flag para checar se houve problema no problema */
 
     /*
-    Salva as informações da árvore no arquivo
+    Salva as informacoes da arvore no arquivo
     Coloca a flag como verdadeira
     */
 void setFlagFalse(Arvore *arv, Flag *fflag);
 
     
     /*
-    Coloca a flag como true e escreve no arquivo a muadnça
+    Coloca a flag como true e escreve no arquivo a mudanca
     */
 void setFlagTrue(Arvore *arv, Flag *fflag);
 
     /*
-    Checa se houve alguma corrupção no arquivo
+    Checa se houve alguma corrupcao no arquivo
     Retorna 1 se houver
-    0 caso contrário
+    0 caso contrario
     */
 int checkFlag(Arvore *arv, Flag *fflag);
