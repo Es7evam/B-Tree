@@ -124,20 +124,41 @@ void arvore_build(Arvore *arv, FILE *fp, Flag *fflag);
 
 
 
-
-    // Função para o cálculo do Byte_Offset à partir do rrn dado.
+    /* 
+    Função para o cálculo do Byte_Offset à partir do rrn dado.
+    */
 int rrnToOffset(int rrn);
 
-    //escrita no arquivo de dados
+/* Funções de manipulação do arquivo de dados */
+
+    /*
+    Monta um buffer com o conteúdo do registrador
+    Retorna o tamanho do tal buffer para ser escrito
+    */
 int getStrSize(tRegistro *reg, char *buffer);
+
+
+    /*
+    Escreve o determinado registro no arquivo
+    Usa a função acima para gerar o buffer para a escrita
+    */
 int arquivo_escrever(tRegistro *reg);
 
-/* Funções de manipulação do arquivo de dados */
-    //leitura do arquivo de dados
+
+    /*
+    Faz o parsing do buffer e muda a posição de acordo
+    */
 char *parser(char *buffer, int *pos);
+
+
+    /*
+    Lê no arquivo fp e retorna o registro
+    Usa a função de parsing para obter o registro
+    */
 tRegistro arquivo_ler(Arvore *arv, FILE*fp, int *offset);
 
 /* Funções chamadas pelo menu*/
+
     /*
     Insere as determinadas informações no arquivo de dados e na árvore
     tmpId é o id inserido
@@ -146,24 +167,57 @@ tRegistro arquivo_ler(Arvore *arv, FILE*fp, int *offset);
     */
 void insercao(Arvore *arv, int tmpId, string title, string gender, Flag *fflag);
 
-//Faz a busca do id na árvore, já printando uma struct com as informações
+
+    /*
+    Faz a busca do id na árvore
+    Printa uma struct com as informações buscadas no log
+    */
 void busca(Arvore *arv, int idBusca, FILE *fp, Flag *fflag); 
 
 
     /*
-    Imprime a árvore de modo iterativo
+    Imprime a árvore usando uma bfs
+    Feita por níveis portanto, usando uma fila
     */
 void arvore_imprimir(Arvore *arv, Flag *fflag);
 
-//Printa o menu
+
+    /*
+    Imprime o menu para a interação com o usuário
+    */
 void printMenu();
 
+
+    /*
+    Função para debug
+    Imprime algumas informações sobre a árvore
+    */
 void arvore_debug(Arvore *arv);
 
+
+    /*
+    Função para debug
+    Imprime a página de RRN passado
+    */
 void pagina_imprimir(Arvore *arv, int idPag);
 
+/* Funções relativas à flag para checar se houve problema no problema */
+
+    /*
+    Salva as informações da árvore no arquivo
+    Coloca a flag como verdadeira
+    */
 void setFlagFalse(Arvore *arv, Flag *fflag);
 
+    
+    /*
+    Coloca a flag como true e escreve no arquivo a muadnça
+    */
 void setFlagTrue(Arvore *arv, Flag *fflag);
 
+    /*
+    Checa se houve alguma corrupção no arquivo
+    Retorna 1 se houver
+    0 caso contrário
+    */
 int checkFlag(Arvore *arv, Flag *fflag);
