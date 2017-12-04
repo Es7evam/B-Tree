@@ -570,6 +570,8 @@ void arvore_imprimir(Arvore *arv, Flag *fflag){
 
     int *fila = new int(1000); //MAXIMO de nós = 1000;
     int filafim = 0, curr=0;
+    int *nivel = new int(1000);
+    nivel[0] = 0;
 
     clog << "Execucao de operacao para mostrar a arvore-B gerada:" << endl;
 
@@ -585,7 +587,7 @@ void arvore_imprimir(Arvore *arv, Flag *fflag){
         cout << "Pagina" << fila[curr] << endl;
 #endif
         pagina_ler(arv, &pag, fila[curr]);
-        clog << fila[curr] << " " << pag.num_chaves;
+        clog << nivel[curr] << " " << pag.num_chaves;
         for(i = 0; i < pag.num_chaves; i++) {
             clog << " <" << pag.entradas[i].id << "/" << pag.entradas[i].byte_offset << ">"; 
 #ifdef DEBUG
@@ -593,10 +595,12 @@ void arvore_imprimir(Arvore *arv, Flag *fflag){
             printf("elemento[%d] = %d:%d\n", i, pag.entradas[i].id, pag.entradas[i].byte_offset); //ajeitar(?)
 #endif
             if(pag.ponteiros[i] != -1){
+                nivel[filafim] = nivel[curr] + 1;
                 fila[filafim++] = pag.ponteiros[i];
             }
         }
         if(pag.ponteiros[i] != -1){
+                nivel[filafim] = nivel[curr] + 1;
                 fila[filafim++] = pag.ponteiros[i];
         }
         clog << endl;
