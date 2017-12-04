@@ -116,54 +116,6 @@ int main(void) {
         fflush(dataFile);
         setFlagTrue(&arvore, &okFlag);
     }
-#ifdef DEBUG
-    //arvore_imprimir(&arvore);
-#endif
-
-/*
-    //MONTANDO ARVORE
-    while(!feof(dataFile)) { // 0 se final do arquivo
-        offset = ftell(dataFile);
-        int ids;
-        string title;
-        string gen;
-
-        fgets(buff, 1000, dataFile);
-        
-        memcpy(temp.CEP, buff, 8);
-        
-        //temp.CEP[8] = '\0';
-        //AJEITAR
-
-        temp.id = ids;
-        temp.titulo = title;
-        temp.genero = gen;
-        temp.byte_offset = offset; // Pega o byte offset, adquirido anteriormente.
-        arvore_inserir(&arvore, temp);
-    }
-*/
-/*
-    consultas = fopen("consultas.txt", "r");
-    while(!feof(consultas)) {
-    	fgets(buff, 1000, consultas);
-        LIMPAR_QUEBRA(buff);
- 
-		
-        //offset = arvore_busca(&arvore, buff);
-         
-        // AJEITAR AQUI
-        
-        if(offset < 0) {
-            printf("%s NAO ENCONTRADO\n", buff);
-        }
-        else {
-            fseek(dataFile, offset, SEEK_SET);
-            fgets(buff, 1000, dataFile);
-            LIMPAR_QUEBRA(buff);
-            printf("%s\n", buff);
-        }
-    }
-*/
     fclose(arvore.fp);
     fclose(dataFile);
     return 0;
