@@ -29,28 +29,29 @@ int main(void) {
     int  idTmp;
     string tituloTmp, generoTmp, strNull;
     bool stay = true;
-    while(stay){
-        if(checkFlag(&arvore, &okFlag)){
-        //    arvore_iniciar(&arvore, true, dataFile, &okFlag);
+    if(checkFlag(&arvore, &okFlag)){
+    //    arvore_iniciar(&arvore, true, dataFile, &okFlag);
 #ifdef DEBUG
-            cout << "Arquivo corrompido, recriando-o" << endl;
+    cout << "Arquivo corrompido, recriando-o" << endl;
 #endif
-        }
+    }
+    while(stay){
+
         setFlagFalse(&arvore, &okFlag);
         printMenu();
         int opt;
-        cin >> opt;
+        cin >> opt; 
+        while(cin.fail()) { //validação dos dados
+            cout << "Digite um valor inteiro!" << endl;
+            cin.clear();
+            std::cin.ignore(256,'\n');
+            cin >> idTmp;
+        }
 #ifdef DEBUG
         cout << endl << endl;
 #endif
         switch(opt){
            case 1: 
-                if(!dadosExiste){
-                    cout << "Arquivo de dados inexistente!" << endl;
-                    cout << "Impossivel construir indice..." << endl;
-
-                    break;
-                }
                 clog << "Execucao da criacao do arquivo de indice " << INDEX_FILE;
                 clog << " com base no arquivo de dados " << DATA_FILE << ".\n";
                 arvore_iniciar(&arvore, true, dataFile, &okFlag);

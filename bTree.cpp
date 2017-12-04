@@ -452,7 +452,7 @@ int getStrSize(tRegistro *reg, char *buffer){
 
 int arquivo_escrever(tRegistro *reg){
     FILE *fp;
-    fp = fopen("dados.dat", "ab"); // abre no final
+    fp = fopen(DATA_FILE, "ab"); // abre no final
 
     char buffer[300];
     int offset;

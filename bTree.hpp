@@ -9,7 +9,7 @@
 using namespace std;
 
 #define DATA_FILE "dados.dat" //nome arquivo de dados
-#define INDEX_FILE "indices.dat" //nome arquivo de indices
+#define INDEX_FILE "indices.idx" //nome arquivo de indices
 #define LOG_FILE "log_EArantes.txt"
 
 #define MAXIMO_CHAVES 4 /* Ordem 5 */
@@ -156,6 +156,7 @@ char *parser(char *buffer, int *pos);
     Usa a função de parsing para obter o registro
     */
 tRegistro arquivo_ler(Arvore *arv, FILE*fp, int *offset);
+
 
 /* Funções chamadas pelo menu*/
 
