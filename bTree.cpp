@@ -327,15 +327,14 @@ int arvore_busca(Arvore *arv, int idBusca) { //ok
     return -1;
 }
 
-void arvore_iniciar(Arvore *arv, bool build, FILE *fp) { //ok
+void arvore_iniciar(Arvore *arv, bool build, FILE *fp, Flag *flagTmp) { //ok
     arv->paginas = 1;
     arv->raiz = 0;
     arv->ponteiro = -TAMANHO_PAGINA; /* Começa com -tampag para facilitar */
     arv->fp = NULL;
 
-    Flag flagTmp;
-    flagTmp.flagOk = 1;
-    flagTmp.raiz = 0;
+    flagTmp->flagOk = 1;
+    flagTmp->raiz = 0;
     bool go = true;
 
     Pagina pag;
@@ -354,21 +353,22 @@ void arvore_iniciar(Arvore *arv, bool build, FILE *fp) { //ok
 #ifdef DEBUG
             cout << "Arquivo vazio";
 #endif
+            rewind(arv->fp);
             go = false; //arquivo vazio
             fwrite(&flagTmp, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
+            fflush(arv->fp);
             pagina_escrever(arv, &pag, -1);
-        }
-        rewind(fp);
+        }else{
+            rewind(arv->fp);
 
-        if(go){
-            fread(&flagTmp, sizeof(Flag), 1, arv->fp); //le infos da arvor
+            fread(&flagTmp, sizeof(Flag), 1, arv->fp); //le infos da arvore
             if(feof(arv->fp)){
                 build = true;
 #ifdef DEBUG
                 cout << "EOF" << endl;
 #endif
             }else{
-                arv->raiz = flagTmp.raiz;
+                arv->raiz = flagTmp->raiz;
                 pagina_ler(arv, &pag, arv->raiz); //lê a raiz
 #ifdef DEBUG
                 cout << "Leu raiz " << arv->raiz << endl;
@@ -376,8 +376,11 @@ void arvore_iniciar(Arvore *arv, bool build, FILE *fp) { //ok
             }
         }
     }
+
+#ifdef DEBUG
     pagina_imprimir(arv, 0);
-    pagina_imprimir(arv, -1);
+#endif
+
     if(build){ //ajeitar (raiz zoada)
         fclose(arv->fp);
         arv->fp = fopen(INDEX_FILE, "w+b");

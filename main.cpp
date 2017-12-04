@@ -7,8 +7,10 @@ int main(void) {
     char buff[1000] = {};
     FILE *dataFile = NULL;
     FILE *consultas = NULL;
+
     tRegistro temp;
     Arvore arvore;
+    Flag okFlag;
 
     bool dadosExiste = true;
     dataFile = fopen(DATA_FILE, "rb+"); //ajeitar nome arquivo
@@ -19,7 +21,7 @@ int main(void) {
     }
 
     
-    arvore_iniciar(&arvore, true, dataFile); //não constrói, só inicia
+    arvore_iniciar(&arvore, false, dataFile, &okFlag); //não constrói, só inicia
     //ajeitar
     arvore_debug(&arvore);
     int  idTmp;
@@ -42,7 +44,7 @@ int main(void) {
                 }
                 clog << "Execucao da criacao do arquivo de indice " << INDEX_FILE;
                 clog << " com base no arquivo de dados " << DATA_FILE << ".\n";
-                arvore_iniciar(&arvore, true, dataFile);
+                arvore_iniciar(&arvore, true, dataFile, &okFlag);
                 break;
     
            case 2:
@@ -93,7 +95,7 @@ int main(void) {
                 fclose(dataFile);
                 arvore.fp = fopen(INDEX_FILE, "wb+");
                 dataFile = fopen(DATA_FILE, "wb+");
-                arvore_iniciar(&arvore, true, dataFile);
+                arvore_iniciar(&arvore, true, dataFile, &okFlag);
                 break;
 #endif
 

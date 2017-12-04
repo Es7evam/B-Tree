@@ -112,7 +112,7 @@ int arvore_busca(Arvore *arv, int idBusca); //ok
     Se build for true, ela construirá a árvore à partir do arquivo de dados
     Se build for false, apenas inicializa a árvore vazia.
     */
-void arvore_iniciar(Arvore *arv, bool build, FILE *fp); //ok
+void arvore_iniciar(Arvore *arv, bool build, FILE *fp, Flag *flagTmp); //ok
 
 
     /*
