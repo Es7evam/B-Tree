@@ -161,6 +161,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
     pai = pagina_escrever(arv, &pag_pai, pai);
     pagina_escrever(arv, pag, pagina);
 
+    clog << "Divisao de no - pagina " << pagina << endl;
 #ifdef DEBUG
     printf("Split: %d para %d e %d\n", pagina, nova, pai);
 #endif
@@ -218,10 +219,6 @@ int pagina_inserir(Arvore *arv, Pagina *pag, entrada elem) {
 
 int arvore_inserir(Arvore *arv, entrada elem) {
     if(arvore_busca(arv, elem.id) != -1){
-        clog << "Chave " << elem.id << " duplicada" << endl;
-#ifdef DEBUG
-        cout << "Insercao duplicada" << endl;
-#endif
         return -1;
     }
     int pagina_pai = -1;
@@ -239,7 +236,9 @@ int arvore_inserir(Arvore *arv, entrada elem) {
         splitted = true;
         pagina_ler(arv, &pag, arv->raiz);
         pagina_pai = -1;
+#ifdef DEBUG
         cout << "Entrou aqui, id = " << elem.id << endl;
+#endif
     }
 
     while(true) {
@@ -267,8 +266,9 @@ int arvore_inserir(Arvore *arv, entrada elem) {
 #endif
                     clog << "Chave " << elem.id << " inserida com sucesso" << endl;
                     if(!splitted){
-                        printf("Inserindo %d na pagina %d\n", elem.id, pagina_atual);
+#ifdef DEBUG
                         cout << "Inseriu " << elem.id << " na pagina " << pagina_atual << endl;
+#endif
                         pagina_inserir(arv, &pag, elem);
                         pagina_escrever(arv, &pag, pagina_atual);
                     }
@@ -328,40 +328,34 @@ int arvore_busca(Arvore *arv, int idBusca) { //ok
 }
 
 void arvore_iniciar(Arvore *arv, bool build, FILE *fp, Flag *flagTmp) { //ok
-    arv->paginas = 1;
     arv->raiz = 0;
-    arv->ponteiro = -TAMANHO_PAGINA; /* Começa com -tampag para facilitar */
     arv->fp = NULL;
-
     flagTmp->flagOk = 1;
-    flagTmp->raiz = 0;
-    bool go = true;
 
     Pagina pag;
     pag.num_chaves = 0;
     memset(pag.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));
     memset(pag.entradas, 0, MAXIMO_CHAVES*sizeof(entrada));
 
-
     arv->fp = fopen(INDEX_FILE, "r+b");
     if(arv->fp == NULL){
         cout << "Nao existia arquivo de indices, foi criado" << endl;
         arv->fp = fopen(INDEX_FILE, "w+b"); //ajeitar nome arquivo (talvez rb+)
-        fwrite(&flagTmp, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
+        fwrite(flagTmp, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
+        build = true;
     } else{
         if(fgetc(arv->fp) == EOF){
 #ifdef DEBUG
             cout << "Arquivo vazio";
 #endif
             rewind(arv->fp);
-            go = false; //arquivo vazio
-            fwrite(&flagTmp, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
+            fwrite(flagTmp, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
             fflush(arv->fp);
             pagina_escrever(arv, &pag, -1);
         }else{
             rewind(arv->fp);
 
-            fread(&flagTmp, sizeof(Flag), 1, arv->fp); //le infos da arvore
+            fread(flagTmp, sizeof(Flag), 1, arv->fp); //le infos da arvore
             if(feof(arv->fp)){
                 build = true;
 #ifdef DEBUG
@@ -369,10 +363,9 @@ void arvore_iniciar(Arvore *arv, bool build, FILE *fp, Flag *flagTmp) { //ok
 #endif
             }else{
                 arv->raiz = flagTmp->raiz;
+                arv->paginas = flagTmp->paginas;
+                arv->ponteiro = flagTmp->ponteiro;
                 pagina_ler(arv, &pag, arv->raiz); //lê a raiz
-#ifdef DEBUG
-                cout << "Leu raiz " << arv->raiz << endl;
-#endif
             }
         }
     }
@@ -381,22 +374,35 @@ void arvore_iniciar(Arvore *arv, bool build, FILE *fp, Flag *flagTmp) { //ok
     pagina_imprimir(arv, 0);
 #endif
 
-    if(build){ //ajeitar (raiz zoada)
+    if(build){
         fclose(arv->fp);
-        arv->fp = fopen(INDEX_FILE, "w+b");
+        arv->fp = fopen(INDEX_FILE, "wb+");
         rewind(fp); //rewind por segurança
-        fwrite(&flagTmp, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
-        pagina_escrever(arv, &pag, -1);
-        arvore_build(arv, fp);
+        rewind(arv->fp);
+        fwrite(flagTmp, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
+        arvore_build(arv, fp, flagTmp);
     } //ajeitar
 
+    setFlagTrue(arv, flagTmp);
 }
 
-void arvore_build(Arvore *arv, FILE *fp){
+void arvore_build(Arvore *arv, FILE *fp, Flag *fflag){
+    arv->paginas = 1;    
+    arv->ponteiro = -TAMANHO_PAGINA; /* Começa com -tampag para facilitar */
+    arv->raiz = 0;
+
+    Pagina raiz;
+    pagina_ler(arv, &raiz, 0);
+    memset(raiz.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));
+    memset(raiz.entradas, 0, MAXIMO_CHAVES*sizeof(entrada));
+    pagina_escrever(arv, &raiz, -1);
+
+    setFlagFalse(arv, fflag);
     int offset;
     //lembrar flag aqui ajeitar
     tRegistro tmp;
     entrada entradaTmp;
+
 
     bool go = true;
     if(fgetc(fp) == EOF){
@@ -419,6 +425,7 @@ void arvore_build(Arvore *arv, FILE *fp){
 #endif
         arvore_inserir(arv, entradaTmp);
     }
+    setFlagTrue(arv, fflag);
 }
 
 int rrnToOffset(int pagina){
@@ -505,7 +512,10 @@ tRegistro arquivo_ler(Arvore *arv, FILE *fp, int *offset){
     return reg;
 }
 
-void insercao(Arvore *arv, int tmpId, string title, string gender){
+void insercao(Arvore *arv, int tmpId, string title, string gender, Flag *fflag){
+    fflag->raiz = arv->raiz;
+    setFlagFalse(arv, fflag);
+
     tRegistro tmpReg;
     entrada elemEntrada;
     
@@ -514,14 +524,23 @@ void insercao(Arvore *arv, int tmpId, string title, string gender){
     tmpReg.titulo = title;
     tmpReg.genero = gender;
 
-    int offset = arquivo_escrever(&tmpReg);
+    if(arvore_busca(arv, tmpId) != -1){
+        clog << "Chave " << tmpId << " duplicada" << endl;
+#ifdef DEBUG
+        cout << "Insercao duplicada" << endl;
+#endif
+        return;
+    }
 
+    int offset = arquivo_escrever(&tmpReg);
     elemEntrada.id = tmpId;
     elemEntrada.byte_offset = offset; // ajeitar (?)
     arvore_inserir(arv, elemEntrada);
+    setFlagTrue(arv, fflag);
 }
 
-void busca(Arvore *arv, int idBusca, FILE *fp){
+void busca(Arvore *arv, int idBusca, FILE *fp, Flag *fflag){
+    setFlagFalse(arv, fflag);
     int offset = arvore_busca(arv, idBusca);
 #ifdef DEBUG
     cout << "Offset: " << offset << endl;
@@ -541,9 +560,11 @@ void busca(Arvore *arv, int idBusca, FILE *fp){
         clog << ", Titulo: " << tmpReg.titulo;
         clog << ", Genero: " << tmpReg.genero << endl;
     }
+    setFlagTrue(arv, fflag);
 }
 
-void arvore_imprimir(Arvore *arv){
+void arvore_imprimir(Arvore *arv, Flag *fflag){
+    setFlagFalse(arv, fflag);
     Pagina pag;
     int i, j;
 
@@ -560,7 +581,9 @@ void arvore_imprimir(Arvore *arv){
 
     fila[filafim++] = arv->raiz;
     while(curr != filafim){
+#ifdef DEBUG
         cout << "Pagina" << fila[curr] << endl;
+#endif
         pagina_ler(arv, &pag, fila[curr]);
         clog << fila[curr] << " " << pag.num_chaves;
         for(i = 0; i < pag.num_chaves; i++) {
@@ -584,6 +607,7 @@ void arvore_imprimir(Arvore *arv){
         curr++;
     }
     delete(fila);
+    setFlagTrue(arv, fflag);
 }
 
 void printMenu(){
@@ -622,4 +646,45 @@ void pagina_imprimir(Arvore *arv, int idPag){
         printf("elemento[%d] = %d:%d\n", i, pag.entradas[i].id, pag.entradas[i].byte_offset); //ajeitar(?)
     }
     cout << endl;
+}
+
+void setFlagFalse(Arvore *arv, Flag *fflag){
+    fflag->raiz = arv->raiz;
+#ifdef DEBUG
+    cout << "Setou flag falsa" << endl;
+#endif
+    int offset = ftell(arv->fp);
+    fflag->flagOk = false;
+    rewind(arv->fp);
+    fwrite(fflag, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
+    
+    fseek(arv->fp, offset, SEEK_SET); //volta o ponteiro pra onde estava
+}
+
+void setFlagTrue(Arvore *arv, Flag *fflag){
+    fflag->raiz = arv->raiz;
+    fflag->paginas = arv->paginas;
+    fflag->ponteiro = arv->ponteiro;
+#ifdef DEBUG
+    cout << "Setou flag verdadeira" << endl;
+#endif
+    int offset = ftell(arv->fp);
+    fflag->flagOk = true;
+    rewind(arv->fp);
+    fwrite(fflag, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
+
+    fseek(arv->fp, offset, SEEK_SET); //volta o ponteiro pra onde estava
+}
+
+int checkFlag(Arvore *arv, Flag *fflag){
+    int offset = ftell(arv->fp);
+    rewind(arv->fp);
+    fread(fflag, sizeof(Flag), 1, arv->fp);
+
+    
+    fseek(arv->fp, offset, SEEK_SET);
+    if(fflag->flagOk == false)
+        return 1;
+    else
+        return 0;
 }

@@ -45,6 +45,8 @@ typedef struct Arvore {
 typedef struct Flag {
     int flagOk;
     int raiz;
+    int paginas;
+    int ponteiro;
 } Flag;
 
 #ifdef DEBUG
@@ -118,7 +120,7 @@ void arvore_iniciar(Arvore *arv, bool build, FILE *fp, Flag *flagTmp); //ok
     /*
     Constrói a árvore à partir do arquivo de dados
     */
-void arvore_build(Arvore *arv, FILE *fp);
+void arvore_build(Arvore *arv, FILE *fp, Flag *fflag);
 
 
 
@@ -142,16 +144,16 @@ tRegistro arquivo_ler(Arvore *arv, FILE*fp, int *offset);
     title é o título inserido
     gender é o genero inserido
     */
-void insercao(Arvore *arv, int tmpId, string title, string gender);
+void insercao(Arvore *arv, int tmpId, string title, string gender, Flag *fflag);
 
 //Faz a busca do id na árvore, já printando uma struct com as informações
-void busca(Arvore *arv, int idBusca, FILE *fp); 
+void busca(Arvore *arv, int idBusca, FILE *fp, Flag *fflag); 
 
 
     /*
     Imprime a árvore de modo iterativo
     */
-void arvore_imprimir(Arvore *arv);
+void arvore_imprimir(Arvore *arv, Flag *fflag);
 
 //Printa o menu
 void printMenu();
@@ -159,3 +161,9 @@ void printMenu();
 void arvore_debug(Arvore *arv);
 
 void pagina_imprimir(Arvore *arv, int idPag);
+
+void setFlagFalse(Arvore *arv, Flag *fflag);
+
+void setFlagTrue(Arvore *arv, Flag *fflag);
+
+int checkFlag(Arvore *arv, Flag *fflag);

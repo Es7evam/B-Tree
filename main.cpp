@@ -23,11 +23,20 @@ int main(void) {
     
     arvore_iniciar(&arvore, false, dataFile, &okFlag); //não constrói, só inicia
     //ajeitar
+#ifdef DEBUG
     arvore_debug(&arvore);
+#endif
     int  idTmp;
     string tituloTmp, generoTmp, strNull;
     bool stay = true;
     while(stay){
+        if(checkFlag(&arvore, &okFlag)){
+        //    arvore_iniciar(&arvore, true, dataFile, &okFlag);
+#ifdef DEBUG
+            cout << "Arquivo corrompido, recriando-o" << endl;
+#endif
+        }
+        setFlagFalse(&arvore, &okFlag);
         printMenu();
         int opt;
         cin >> opt;
@@ -66,14 +75,14 @@ int main(void) {
                 clog << "Execucao de operacao de INSERCAO de " << idTmp << ", " << tituloTmp;
                 clog << ", " << generoTmp << "." << endl; //leitura ok
 
-                insercao(&arvore, idTmp, tituloTmp, generoTmp);
+                insercao(&arvore, idTmp, tituloTmp, generoTmp, &okFlag);
                 break;
             
             case 3:
                 cout << "Digite o id da musica que quer buscar: ";
                 cin >> idTmp;
                 clog << "Execucao de operacao de PESQUISA de " << idTmp << "." << endl;
-                busca(&arvore, idTmp, dataFile);
+                busca(&arvore, idTmp, dataFile, &okFlag);
                 break;
             
             case 4:
@@ -82,7 +91,7 @@ int main(void) {
                 break;
             
             case 5:
-                arvore_imprimir(&arvore);
+                arvore_imprimir(&arvore, &okFlag);
                 break;
             
             case 6:
@@ -105,6 +114,7 @@ int main(void) {
         }
         fflush(arvore.fp);
         fflush(dataFile);
+        setFlagTrue(&arvore, &okFlag);
     }
 #ifdef DEBUG
     //arvore_imprimir(&arvore);
