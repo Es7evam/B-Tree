@@ -66,6 +66,14 @@ int pagina_escrever(Arvore *arv, Pagina *pag, int pagina); //ok
 int pagina_ler(Arvore *arv, Pagina *pag, int pagina); //ok
 
     /*
+    Checa se a ordenacao da pagina esta correta
+    Nao muda-se os ponteiros de lugar pois só ocorre em pag nova
+    Onde os ponteiros serao -1
+    */
+void pagina_check(Pagina *pag);
+
+
+    /*
     Faz o split da página, já redistribuindo as chaves e offsets
     Retorna o pai das páginas splitadas (pode ser uma das duas).      
     */

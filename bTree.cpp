@@ -21,6 +21,26 @@ int pagina_ler(Arvore *arv, Pagina *pag, int pagina) {
     return pagina;
 }
 
+
+void pagina_check(Pagina *pag){
+    entrada aux;
+    bool trocado;
+    do{ 
+        trocado = false;          
+        for(int i=0;i<pag->num_chaves-1;i++){
+            if(pag->entradas[i].id > pag->entradas[i+1].id){
+                trocado = true;   
+#ifdef DEBUG
+                cout << "Swap entre " << pag->entradas[i].id << " e " << pag->entradas[i+1].id;
+#endif
+                aux = pag->entradas[i];
+                pag->entradas[i] = pag->entradas[i+1];
+                pag->entradas[i+1] = aux;
+            }
+        }
+    }   while(trocado);
+}
+
 int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
     Pagina pag_nova;
     Pagina pag_pai;
@@ -56,8 +76,8 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
     tmpPonteiro[i] = pag->ponteiros[i]; // pega o ultimo ponteiro
     
 
-    for(i=0; i < MAXIMO_CHAVES && !ok; i++) {
-        if(pag->entradas[i].id - elem.id > 0){ 
+    for(i=0; i < MAXIMO_CHAVES+1 && !ok; i++) {
+        if(tmpEntrada[i].id - elem.id > 0){ 
             posicao_ideal = i;
             ok = true;
         }
@@ -106,7 +126,11 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
     pag_nova.ponteiros[0] = tmpPonteiro[medio+1];
     tmpPonteiro[medio+1] = -1;
 
+    pagina_check(&pag_nova);
     nova = pagina_escrever(arv, &pag_nova, -1);
+#ifdef DEBUG
+    cout << "Nova: " << nova << endl;
+#endif
 
     /* Início do "promoting". */
     /* Agora insere o elemento mediano na pagina pai. */
@@ -205,11 +229,14 @@ int arvore_inserir(Arvore *arv, entrada elem) {
     pagina_ler(arv, &pag, arv->raiz);
     pagina_atual = arv->raiz;
 
+    bool splitted = false;
     if(pagina_atual == arv->raiz && pag.num_chaves == MAXIMO_CHAVES) {
     	//fazendo split da raiz se necessario
         pagina_atual = pagina_split(arv, &pag, pagina_atual, -1, elem);
+        splitted = true;
         pagina_ler(arv, &pag, arv->raiz);
         pagina_pai = -1;
+        cout << "Entrou aqui, id = " << elem.id << endl;
     }
 
     while(true) {
@@ -225,21 +252,24 @@ int arvore_inserir(Arvore *arv, entrada elem) {
 
                     if(pag.num_chaves == MAXIMO_CHAVES) {
                         pagina_atual = pagina_split(arv, &pag, pagina_atual, pagina_pai, elem);
+                        splitted = true;
                         pagina_ler(arv, &pag, pagina_atual);
                         pagina_pai = -1;
                     }
                     fim_pagina = 1;
                 }
                 else {
-                    /* Inserir na pagina, caso a mesma no esteja vazia. */
+                    /* Inserir na pagina, caso ela nao esteja vazia. */
 #ifdef DEBUG
-                    printf("Inserindo %d na pagina %d\n", elem.id, pagina_atual);
 #endif
                     clog << "Chave " << elem.id << " inserida com sucesso" << endl;
-                    pagina_inserir(arv, &pag, elem);
-                    pagina_escrever(arv, &pag, pagina_atual);
+                    if(!splitted){
+                        printf("Inserindo %d na pagina %d\n", elem.id, pagina_atual);
+                        cout << "Inseriu " << elem.id << " na pagina " << pagina_atual << endl;
+                        pagina_inserir(arv, &pag, elem);
+                        pagina_escrever(arv, &pag, pagina_atual);
+                    }
 #ifdef DEBUG
-                    cout << "Inseriu " << elem.id << " na pagina " << pagina_atual << endl;
 #endif
 
                     return pagina_atual; /* Ponto de saída da funçao, apos a inserçao. */
@@ -352,8 +382,13 @@ void arvore_build(Arvore *arv, FILE *fp){
     }
 }
 
-int rrnToOffset(int rrn){
-    return (sizeof(int) + rrn*TAMANHO_PAGINA);
+int rrnToOffset(int pagina){
+    int calc = 0;
+    calc += sizeof(int); //flag
+    calc += sizeof(Arvore);
+    calc = pagina * TAMANHO_PAGINA; //offset sem flag
+
+    return (sizeof(int) + pagina*TAMANHO_PAGINA);
 }
 
 //ESCREVER NO ARQUIVO DE DADOS
