@@ -26,7 +26,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
     Pagina pag_pai;
     int local = 0; /* local onde ser· inserido o elemento promovido */
     int nova = 0; /* nro nova página */
-    int medio = (MAXIMO_CHAVES+1)/2; /* posiçao mediana */
+    int medio = (MAXIMO_CHAVES)/2; /* posiçao mediana */
     int i = 0;
 
     /* Iniciar as paginas novas
@@ -44,40 +44,87 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
     pag_nova.num_chaves = 0;
     memset(pag_nova.entradas, 0, MAXIMO_CHAVES*sizeof(entrada));
     memset(pag_nova.ponteiros, -1, (MAXIMO_CHAVES+1)*sizeof(int));    
-    
-    //minimo de elementos
 
+    i=0;
+    bool ok = false;
+    entrada tmpEntrada[MAXIMO_CHAVES+1];
+    int tmpPonteiro[MAXIMO_CHAVES+2], posicao_ideal = -1;
+    for(i=0; i < MAXIMO_CHAVES;i++){
+        tmpEntrada[i] = pag->entradas[i];
+        tmpPonteiro[i] = pag->ponteiros[i];
+    } // Copia para o vetor auxiliar
+    tmpPonteiro[i] = pag->ponteiros[i]; // pega o ultimo ponteiro
+    
+
+    for(i=0; i < MAXIMO_CHAVES && !ok; i++) {
+        if(pag->entradas[i].id - elem.id > 0){ 
+            posicao_ideal = i;
+            ok = true;
+        }
+    }
+    //Se no encontrou posiçao ideal e há mais de uma chave
+    // no vetor, entao a posiçao ideal é no final do vetor.
+    if(posicao_ideal < 0) {
+        posicao_ideal = MAXIMO_CHAVES-1;
+    }
+
+    //Espaço vazio
+    i = MAXIMO_CHAVES;
+
+    while(posicao_ideal != i) {
+        tmpPonteiro[i+1] = tmpPonteiro[i]; // move o ponteiro adiantado 
+        tmpPonteiro[i] = -1;
+
+        tmpEntrada[i] = tmpEntrada[i-1];
+        i--;
+    }
+
+    //Move os ponteiros e finalmente aloca o elemento em sua posiçao. 
+    tmpPonteiro[posicao_ideal+1] = tmpPonteiro[posicao_ideal];
+    tmpPonteiro[posicao_ideal] = -1;
+    tmpEntrada[posicao_ideal] = elem;
+
+    //minimo de elementos
     /* Insere os elementos da pagina a sofrer 'splitting' na pagina
      * nova e remove os mesmos da pagina original. */
-    for(i = medio+1; i < MAXIMO_CHAVES; i++) {
+    for(i = medio+1; i < MAXIMO_CHAVES+1; i++) {
         /* i-(medio+1) faz com que o laço comece em 0 para
          * a pagina nova, que vai receber os novos elementos. */
-        pag_nova.entradas[i-(medio+1)] = pag->entradas[i];
-        pag->entradas[i].id = 0; // Apaga o elemento       //AJEITAR
-                                           
+        pag_nova.entradas[i-(medio+1)] = tmpEntrada[i];
+        tmpEntrada[i].id = 0; // Apaga o elemento       //AJEITAR
+         
 
         /* Move agora os ponteiros. */
-        pag_nova.ponteiros[i-medio] = pag->ponteiros[i+1];
-        pag->ponteiros[i+1] = -1;
+        pag_nova.ponteiros[i-medio] = tmpPonteiro[i+1];
+        tmpPonteiro[i+1] = -1;
     }
+
     pag_nova.num_chaves = medio;
     pag->num_chaves = medio;
 
     /* Move agora o ponteiro final de pag para nova */
-    pag_nova.ponteiros[0] = pag->ponteiros[medio+1];
-    pag->ponteiros[medio+1] = -1;
+    pag_nova.ponteiros[0] = tmpPonteiro[medio+1];
+    tmpPonteiro[medio+1] = -1;
 
     nova = pagina_escrever(arv, &pag_nova, -1);
 
     /* Início do "promoting". */
     /* Agora insere o elemento mediano na pagina pai. */
-    local = pagina_inserir(arv, &pag_pai, pag->entradas[medio]);
-    pag->entradas[medio].id = 0;
+    clog << "Chave " << tmpEntrada[medio].id << " promovida" << endl;
+    local = pagina_inserir(arv, &pag_pai, tmpEntrada[medio]);
+    tmpEntrada[medio].id = 0;
+
 
     /* Coloca os ponteiros no pai. */
     pag_pai.ponteiros[local] = pagina;
     pag_pai.ponteiros[local+1] = nova;
     
+    //Copia de volta a pagina temporaria
+    for(i = 0; i < MAXIMO_CHAVES;i++){
+        pag->ponteiros[i] = tmpPonteiro[i];
+        pag->entradas[i] = tmpEntrada[i];
+    }
+
     /* Atualiza a ·rvore */
     if(pai == -1) 
     	arv->paginas += 2; 
@@ -144,7 +191,7 @@ int pagina_inserir(Arvore *arv, Pagina *pag, entrada elem) {
 
 int arvore_inserir(Arvore *arv, entrada elem) {
     if(arvore_busca(arv, elem.id) != -1){
-        clog << "Chave " << elem.id << " duplicada";
+        clog << "Chave " << elem.id << " duplicada" << endl;
 #ifdef DEBUG
         cout << "Insercao duplicada" << endl;
 #endif
@@ -188,6 +235,7 @@ int arvore_inserir(Arvore *arv, entrada elem) {
 #ifdef DEBUG
                     printf("Inserindo %d na pagina %d\n", elem.id, pagina_atual);
 #endif
+                    clog << "Chave " << elem.id << " inserida com sucesso" << endl;
                     pagina_inserir(arv, &pag, elem);
                     pagina_escrever(arv, &pag, pagina_atual);
 #ifdef DEBUG
@@ -465,9 +513,11 @@ void arvore_imprimir(Arvore *arv){
         if(pag.ponteiros[i] != -1){
                 fila[filafim++] = pag.ponteiros[i];
         }
+        clog << endl;
+#ifdef DEBUG
         printf("ponteiro[%d]: = %d\n", i, pag.ponteiros[i]);
         printf("--------------------\n");
-        cout << endl;
+#endif
         curr++;
     }
     delete(fila);

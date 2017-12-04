@@ -114,10 +114,6 @@ void arvore_iniciar(Arvore *arv, bool build, FILE *fp); //ok
 void arvore_build(Arvore *arv, FILE *fp);
 
 
-    /*
-    Imprime a árvore de modo iterativo
-    */
-void arvore_imprimir(Arvore *arv);
 
 
 // Função para o cálculo do Byte_Offset à partir do rrn dado.
@@ -137,6 +133,12 @@ void insercao(Arvore *arv, int tmpId, string title, string gender);
 
 //Faz a busca do id na árvore, já printando uma struct com as informações
 void busca(Arvore *arv, int idBusca, FILE *fp); 
+
+
+    /*
+    Imprime a árvore de modo iterativo
+    */
+void arvore_imprimir(Arvore *arv);
 
 //Printa o menu
 void printMenu();
