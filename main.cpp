@@ -30,7 +30,7 @@ int main(void) {
     string tituloTmp, generoTmp, strNull;
     bool stay = true;
     if(checkFlag(&arvore, &okFlag)){
-    //    arvore_iniciar(&arvore, true, dataFile, &okFlag);
+        arvore_iniciar(&arvore, true, dataFile, &okFlag);
 #ifdef DEBUG
     cout << "Arquivo corrompido, recriando-o" << endl;
 #endif
