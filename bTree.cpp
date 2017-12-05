@@ -611,6 +611,7 @@ void arvore_imprimir(Arvore *arv, Flag *fflag){
         curr++;
     }
     delete(fila);
+    delete(nivel);
     setFlagTrue(arv, fflag);
 }
 

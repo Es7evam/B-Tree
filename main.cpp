@@ -21,7 +21,7 @@ int main(void) {
     }
 
     
-    arvore_iniciar(&arvore, false, dataFile, &okFlag); //não constrói, só inicia
+    arvore_iniciar(&arvore, false, dataFile, &okFlag); //nao constrói, só inicia
     //ajeitar
 #ifdef DEBUG
     arvore_debug(&arvore);
@@ -41,7 +41,7 @@ int main(void) {
         printMenu();
         int opt;
         cin >> opt; 
-        while(cin.fail()) { //validação dos dados
+        while(cin.fail()) { //validaçao dos dados
             cout << "Digite um valor inteiro!" << endl;
             cin.clear();
             std::cin.ignore(256,'\n');
@@ -58,7 +58,7 @@ int main(void) {
                 break;
     
            case 2:
-                cout << "Digite o id da música " << endl;
+                cout << "Digite o id da musica " << endl;
                 cin >> idTmp;
                 while(cin.fail()) {
                     cout << "Digite um valor inteiro!" << endl;
@@ -87,7 +87,7 @@ int main(void) {
                 break;
             
             case 4:
-                cout << "Ainda não implementada :(" << endl << endl;
+                cout << "Ainda nao implementada :(" << endl << endl;
                 //a implementar
                 break;
             

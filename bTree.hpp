@@ -29,7 +29,7 @@ typedef struct tRegistro {
     string genero;
 } tRegistro;
 
-typedef struct Pagina { 
+typedef struct Pagina {
     int num_chaves;
     entrada entradas[MAXIMO_CHAVES];
     int ponteiros[MAXIMO_CHAVES+1]; //RRN da pagina apontada
@@ -76,7 +76,7 @@ void pagina_check(Pagina *pag);
 
     /*
     Faz o split da pagina, ja redistribuindo as chaves e offsets
-    Retorna o pai das paginas splitadas (pode ser uma das duas).      
+    Retorna o pai das paginas splitadas (pode ser uma das duas).
     */
 int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai);
 
@@ -84,7 +84,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai);
     Insere um determinado elemento (elem, conjunto de id e offset)
     A insercao eh feita na pagina pag.
     Retorna a posicao onde sera feita a insercao do elemento
-    */ 
+    */
 int pagina_inserir(Arvore *arv, Pagina *pag, entrada elem); // ok
 
 
@@ -103,7 +103,7 @@ int arvore_inserir(Arvore *arv, entrada elem); //ok
 
     /*
     Busca o idBusca dentro da arvore.
-    Usa chamadas das funcoes de paginas para isso, de modo iterativo 
+    Usa chamadas das funcoes de paginas para isso, de modo iterativo
     Retorna o offset do id respectivo, caso nao encontre retorna -1.
     */
 int arvore_busca(Arvore *arv, int idBusca); //ok
@@ -124,7 +124,7 @@ void arvore_build(Arvore *arv, FILE *fp, Flag *fflag);
 
 
 
-    /* 
+    /*
     Funcao para o calculo do Byte_Offset a partir do rrn dado.
     */
 int rrnToOffset(int rrn);
@@ -173,7 +173,7 @@ void insercao(Arvore *arv, int tmpId, string title, string gender, Flag *fflag);
     Faz a busca do id na arvore
     Printa uma struct com as informacoes buscadas no log
     */
-void busca(Arvore *arv, int idBusca, FILE *fp, Flag *fflag); 
+void busca(Arvore *arv, int idBusca, FILE *fp, Flag *fflag);
 
 
     /*
@@ -210,7 +210,7 @@ void pagina_imprimir(Arvore *arv, int idPag);
     */
 void setFlagFalse(Arvore *arv, Flag *fflag);
 
-    
+
     /*
     Coloca a flag como true e escreve no arquivo a mudanca
     */
