@@ -13,7 +13,7 @@ int main(void) {
     Flag okFlag;
 
     bool dadosExiste = true;
-    dataFile = fopen(DATA_FILE, "rb+"); //ajeitar nome arquivo
+    dataFile = fopen(DATA_FILE, "rb+"); 
     if(dataFile == NULL){
         cout << "Nao existia arquivo de dados, foi criado um vazio" << endl;
         dataFile = fopen(DATA_FILE, "wb+");
@@ -22,7 +22,7 @@ int main(void) {
 
     
     arvore_iniciar(&arvore, false, dataFile, &okFlag); //nao constrói, só inicia
-    //ajeitar
+
 #ifdef DEBUG
     arvore_debug(&arvore);
 #endif

@@ -114,7 +114,7 @@ int pagina_split(Arvore *arv, Pagina *pag, int pagina, int pai, entrada elem) {
         /* i-(medio+1) faz com que o laço comece em 0 para
          * a pagina nova, que vai receber os novos elementos. */
         pag_nova.entradas[i-(medio+1)] = tmpEntrada[i];
-        tmpEntrada[i].id = 0; // Apaga o elemento       //AJEITAR
+        tmpEntrada[i].id = 0; // Apaga o elemento    
          
 
         /* Move agora os ponteiros. */
@@ -245,7 +245,6 @@ int arvore_inserir(Arvore *arv, entrada elem) {
         for(int i = 0; i <= pag.num_chaves && !fim_pagina; i++) {
             /* Checa-se se eh o ultimo ponteiro da pagina ou se eh um local adequado
              * a se buscar um ponteiro por pagina */
-            //if(i == pag.num_chaves || strcmp(pag.entradas[i].CEP, elem.CEP) > 0) { ajeitar
         	if(i == pag.num_chaves || pag.entradas[i].id - elem.id > 0){
                 if(pag.ponteiros[i] != -1) {
                     pagina_pai = pagina_atual;
@@ -340,7 +339,7 @@ void arvore_iniciar(Arvore *arv, bool build, FILE *fp, Flag *flagTmp) { //ok
     arv->fp = fopen(INDEX_FILE, "r+b");
     if(arv->fp == NULL){
         cout << "Nao existia arquivo de indices, foi criado" << endl;
-        arv->fp = fopen(INDEX_FILE, "w+b"); //ajeitar nome arquivo (talvez rb+)
+        arv->fp = fopen(INDEX_FILE, "w+b");
         fwrite(flagTmp, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
         build = true;
     } else{
@@ -381,7 +380,7 @@ void arvore_iniciar(Arvore *arv, bool build, FILE *fp, Flag *flagTmp) { //ok
         rewind(arv->fp);
         fwrite(flagTmp, sizeof(Flag), 1, arv->fp); //escreve as infos no arquivo arvore
         arvore_build(arv, fp, flagTmp);
-    } //ajeitar
+    }
 
     setFlagTrue(arv, flagTmp);
 }
@@ -399,7 +398,6 @@ void arvore_build(Arvore *arv, FILE *fp, Flag *fflag){
 
     setFlagFalse(arv, fflag);
     int offset;
-    //lembrar flag aqui ajeitar
     tRegistro tmp;
     entrada entradaTmp;
 
@@ -534,7 +532,7 @@ void insercao(Arvore *arv, int tmpId, string title, string gender, Flag *fflag){
 
     int offset = arquivo_escrever(&tmpReg);
     elemEntrada.id = tmpId;
-    elemEntrada.byte_offset = offset; // ajeitar (?)
+    elemEntrada.byte_offset = offset; 
     arvore_inserir(arv, elemEntrada);
     setFlagTrue(arv, fflag);
 }
@@ -592,7 +590,7 @@ void arvore_imprimir(Arvore *arv, Flag *fflag){
             clog << " <" << pag.entradas[i].id << "/" << pag.entradas[i].byte_offset << ">"; 
 #ifdef DEBUG
             printf("ponteiro[%d]: = %d\n", i, pag.ponteiros[i]);
-            printf("elemento[%d] = %d:%d\n", i, pag.entradas[i].id, pag.entradas[i].byte_offset); //ajeitar(?)
+            printf("elemento[%d] = %d:%d\n", i, pag.entradas[i].id, pag.entradas[i].byte_offset); 
 #endif
             if(pag.ponteiros[i] != -1){
                 nivel[filafim] = nivel[curr] + 1;
@@ -611,7 +609,7 @@ void arvore_imprimir(Arvore *arv, Flag *fflag){
         curr++;
     }
     delete(fila);
-    delete(nivel);
+    delete(nivel);0
     setFlagTrue(arv, fflag);
 }
 
@@ -648,7 +646,7 @@ void pagina_imprimir(Arvore *arv, int idPag){
     pagina_ler(arv, &pag, idPag);
     for(int i = 0; i < MAXIMO_CHAVES; i++) {
         printf("ponteiro[%d]: = %d\n", i, pag.ponteiros[i]);
-        printf("elemento[%d] = %d:%d\n", i, pag.entradas[i].id, pag.entradas[i].byte_offset); //ajeitar(?)
+        printf("elemento[%d] = %d:%d\n", i, pag.entradas[i].id, pag.entradas[i].byte_offset);
     }
     cout << endl;
 }
